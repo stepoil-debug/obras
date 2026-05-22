@@ -87,7 +87,7 @@
     .btn.primary{border-color:rgba(59,163,255,.35);background:linear-gradient(135deg, rgba(59,163,255,.98), rgba(40,215,210,.82));color:#06101c;font-weight:800}
     .btn.danger{border-color:rgba(255,89,100,.30);color:#ffd3d7;background:rgba(255,89,100,.08)}
     .grid{display:grid;gap:16px}
-    .kpis{grid-template-columns:repeat(6,minmax(150px,1fr));}
+    .kpis{grid-template-columns:repeat(auto-fit,minmax(150px,1fr));}
     .card{
       background:linear-gradient(180deg, rgba(19,42,69,.92), rgba(12,28,48,.92));
       border:1px solid var(--line); border-radius:var(--radius); padding:18px; box-shadow:0 8px 30px rgba(0,0,0,.12);
@@ -616,18 +616,18 @@
     }
     function renderKpis(){
       const total=state.items.length;
-      const complete=state.items.filter(i=>i.status==='DEMANDA CONCLUIDA' || Number(i.progress)>=100).length;
-      const ongoing=state.items.filter(i=>i.status==='EM ANDAMENTO').length;
-      const noCost=state.items.filter(i=>!Number(i.cost)).length;
-      const photos=Object.values(state.photos||{}).reduce((a,p)=>a+(p?.length||0),0);
+      const statusCounts=countBy(state.items, i=>i.status || 'SEM STATUS');
       const avg=weightedProgress();
+      const trackedTotal=statuses.reduce((sum,s)=>sum+(statusCounts[s]||0),0);
       const kpis=[
-        ['Total de melhorias', total, 'Carteira atual'],
+        ['Total de melhorias', total, `Soma dos status: ${trackedTotal}`],
         ['Avanço geral', fmtPct(avg), 'Média dos itens'],
-        ['Concluídas', complete, 'Demandas finalizadas'],
-        ['Em andamento', ongoing, 'Execução ativa'],
-        ['Sem orçamento', noCost, 'Precisam de custo'],
-        ['Evidências', photos, 'Fotos anexadas']
+        ['AG. Projeto', statusCounts['AG. PROJETO']||0, 'Aguardando projeto'],
+        ['AG. Cotação', statusCounts['AG. COTAÇÃO']||0, 'Aguardando cotação'],
+        ['AG. Aprovação', statusCounts['AG. APROVAÇÃO']||0, 'Aguardando aprovação'],
+        ['AG. Material', statusCounts['AG. MATERIAL']||0, 'Aguardando material'],
+        ['Em andamento', statusCounts['EM ANDAMENTO']||0, 'Execução ativa'],
+        ['Concluídas', statusCounts['DEMANDA CONCLUIDA']||0, 'Demandas finalizadas']
       ];
       document.getElementById('kpis').innerHTML=kpis.map(k=>`<div class="card kpi"><span>${k[0]}</span><strong>${k[1]}</strong><small>${k[2]}</small></div>`).join('');
     }
