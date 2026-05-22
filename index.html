@@ -674,7 +674,7 @@
         ? `<div class="work-preview-caption" id="workPreviewCaption">1/${photos.length} · ${escapeHtml(photos[0].name)}</div>`
         : '';
       const thumbs = photos.length > 1
-        ? `<div class="work-preview-gallery">${photos.map((p,idx)=>`<button class="work-preview-thumb ${idx===0?'active':''}" data-preview-thumb="${idx}" onclick="selectWorkPreviewPhoto(${jsArg(id)},${idx})"><img src="${p.data}" alt="${escapeHtml(p.name)}"><span>${escapeHtml(p.name)}</span></button>`).join('')}</div>`
+        ? `<div class="work-preview-gallery">${photos.map((p,idx)=>`<button type="button" class="work-preview-thumb ${idx===0?'active':''}" data-preview-id="${escapeHtml(id)}" data-preview-thumb="${idx}"><img src="${p.data}" alt="${escapeHtml(p.name)}"><span>${escapeHtml(p.name)}</span></button>`).join('')}</div>`
         : '';
       workPreviewBody.innerHTML=`
         <div class="work-preview-info">
@@ -699,6 +699,13 @@
           ${thumbs}
         </div>`;
       document.getElementById('workPreviewEditBtn').onclick=()=>{workPreview.close(); openModal(id);};
+      workPreviewBody.querySelectorAll('.work-preview-thumb').forEach(btn=>{
+        btn.addEventListener('click', function(ev){
+          ev.preventDefault();
+          ev.stopPropagation();
+          selectWorkPreviewPhoto(this.getAttribute('data-preview-id') || id, Number(this.getAttribute('data-preview-thumb') || 0));
+        });
+      });
       if(!workPreview.open) workPreview.showModal();
     }
     function selectWorkPreviewPhoto(id, idx){
@@ -709,7 +716,10 @@
       const btn=document.getElementById('workPreviewHeroBtn');
       const caption=document.getElementById('workPreviewCaption');
       if(img){ img.src=p.data; img.alt=p.name||'Imagem da obra'; }
-      if(btn){ btn.onclick=()=>openPhotoPreview(id, idx); }
+      if(btn){
+        btn.dataset.heroPhotoIndex=String(idx);
+        btn.onclick=()=>openPhotoPreview(id, idx);
+      }
       if(caption){ caption.textContent=`${idx+1}/${photos.length} · ${p.name||'Imagem da obra'}`; }
       document.querySelectorAll('#workPreview .work-preview-thumb').forEach(el=>{
         const active=Number(el.dataset.previewThumb)===idx;

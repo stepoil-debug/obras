@@ -71,3 +71,11 @@ A pasta `supabase/` contém um modelo inicial de banco para essa próxima etapa.
 - `docs/PASSO_A_PASSO_CMD.md` — comandos para subir no GitHub.
 - `docs/DECISAO_SUPABASE.md` — decisão técnica sobre banco de dados.
 
+
+
+## Versão v8 - correção pop-up de imagens
+
+- Corrigido clique nas miniaturas dentro do pop-up da obra.
+- Agora a imagem principal troca ao clicar em qualquer miniatura.
+- A miniatura ativa fica destacada.
+- Mantidos zoom da planta, movimentação dos marcadores e atualização da obra.
