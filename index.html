@@ -226,12 +226,12 @@
     <aside>
       <div class="brand">
         <div class="brand-mark">ST</div>
-        <div><h1>STEP<br>Obras e Melhorias</h1><small>Painel Online Netlify</small></div>
+        <div><h1>STEP<br>Obras e Melhorias</h1><small>Painel Online STEP</small></div>
       </div>
       <nav class="nav" id="nav"></nav>
       <div class="side-note">
         <b>Uso sugerido:</b><br>
-        Atualize status, avanço, mapa e evidências. As alterações podem ser salvas no Supabase para todos visualizarem no Netlify.
+        Atualize status, avanço, mapa e evidências. As alterações são sincronizadas no banco para todos visualizarem pelo link do painel.
       </div>
     </aside>
     <main>
@@ -239,7 +239,7 @@
       <div class="topbar">
         <div class="title">
           <h2 id="pageTitle">Painel Executivo de Obras e Melhorias</h2>
-          <p>Controle visual da carteira de melhorias da base STEP, com status das obras, avanço físico, custos, pendências e evidências fotográficas por item da planta. Versão v15 - GitHub + Netlify + Supabase, sem PIN, com diagnóstico de API Key.</p>
+          <p>Controle visual da carteira de melhorias da base STEP, com status das obras, avanço físico, custos, pendências e evidências fotográficas por item da planta. Versão v16 - Painel Online STEP + Supabase, sem PIN.</p>
         </div>
         <div class="actions">
           <button class="btn" onclick="print()">🖨️ Imprimir</button>
@@ -333,9 +333,9 @@
 
       <section class="section" id="sec-config">
         <div class="conf-grid">
-          <div class="card conf-card"><h3>Como usar</h3><p>Este painel está preparado para Netlify + Supabase. Abra o site, clique em <b>Ajustar posições</b>, arraste os números da planta e depois clique em <b>Salvar mapa</b> para gravar as posições no banco. Assim, ao abrir em navegador anônimo ou em outro computador, o mapa carrega as posições salvas no Supabase.</p><p>Para publicar online, suba esta pasta no GitHub e conecte no Netlify. O arquivo principal é o index.html.</p></div>
-          <div class="card conf-card"><h3>Próxima evolução recomendada</h3><p>A versão v12 já inclui funções Netlify para sincronizar dados com Supabase: leitura da carteira, salvamento das posições do mapa, atualização de obra e envio de imagens para o Storage. Configure as variáveis de ambiente no Netlify para ativar a sincronização.</p><div class="code">Módulos futuros:\n- Login por perfil\n- Banco de dados central\n- Upload de fotos por obra\n- Histórico de alteração por usuário\n- Aprovação por responsável\n- Exportação PDF executiva</div></div>
-          <div class="card conf-card"><h3>Edição direta</h3><p>Esta versão não solicita PIN. Ao clicar em <b>Salvar mapa</b>, <b>Atualizar obra</b> ou incluir imagens, o painel grava diretamente no Supabase através da função segura do Netlify.</p><span class="pill">Sem PIN</span></div>
+          <div class="card conf-card"><h3>Como usar</h3><p>Este painel está preparado para publicação online com sincronização no Supabase. Abra o site, clique em <b>Ajustar posições</b>, arraste os números da planta e depois clique em <b>Salvar mapa</b> para gravar as posições no banco. Assim, ao abrir em navegador anônimo ou em outro computador, o mapa carrega as posições salvas no Supabase.</p><p>O arquivo principal é o index.html e a sincronização é feita pela rota interna <b>/api/obras</b>.</p></p></div>
+          <div class="card conf-card"><h3>Próxima evolução recomendada</h3><p>A versão atual sincroniza os dados com Supabase: leitura da carteira, salvamento das posições do mapa, atualização de obra e envio de imagens para o Storage. Configure as variáveis de ambiente do site para ativar a sincronização.</p><div class="code">Módulos futuros:\n- Login por perfil\n- Banco de dados central\n- Upload de fotos por obra\n- Histórico de alteração por usuário\n- Aprovação por responsável\n- Exportação PDF executiva</div></div>
+          <div class="card conf-card"><h3>Edição direta</h3><p>Esta versão não solicita PIN. Ao clicar em <b>Salvar mapa</b>, <b>Atualizar obra</b> ou incluir imagens, o painel grava diretamente no Supabase através da rota segura do site.</p><span class="pill">Sem PIN</span></div>
           <div class="card conf-card"><h3>Reset local</h3><p>Use somente se quiser voltar ao estado original do modelo e apagar atualizações deste navegador.</p><button class="btn danger" onclick="resetState()">Apagar dados locais e restaurar modelo</button></div>
           <div class="card conf-card"><h3>Observação importante</h3><p>Como é uma solução HTML local, imagens muito grandes são comprimidas antes de salvar. Mesmo assim, navegadores têm limite de armazenamento. Para muitos anexos, recomendo migrar o armazenamento das fotos para nuvem.</p></div>
         </div>
@@ -459,7 +459,7 @@
     let markerClickState = { id:null, time:0 };
     let mapDirty = false;
     let remoteOnline = false;
-    const API_URL = '/.netlify/functions/obras';
+    const API_URL = '/api/obras';
 
     function loadState(){
       try{

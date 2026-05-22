@@ -18,8 +18,8 @@ function requiredEnv(name){
 }
 
 function getSupabaseKey(){
-  // Para gravação pelo Netlify, use a chave secreta/service_role.
-  // Aceita estes nomes para evitar erro de configuração no Netlify.
+  // Para gravação, use a chave secreta/service_role no ambiente do site.
+  // Aceita estes nomes para evitar erro de configuração.
   const candidates = [
     'SUPABASE_SERVICE_ROLE_KEY',
     'SUPABASE_SECRET_KEY',
@@ -29,7 +29,7 @@ function getSupabaseKey(){
     const value = (process.env[name] || '').trim();
     if(value) return { name, value };
   }
-  throw new Error('Variável de ambiente ausente: SUPABASE_SERVICE_ROLE_KEY. Cadastre a chave service_role/secret no Netlify.');
+  throw new Error('Variável de ambiente ausente: SUPABASE_SERVICE_ROLE_KEY. Cadastre a chave service_role/secret no ambiente do site.');
 }
 
 function supabase(){
@@ -38,10 +38,10 @@ function supabase(){
 
   // Erros comuns: colar publishable/anon no lugar da service_role, colar a chave quebrada, ou inserir aspas/espaços.
   if(value.includes(' ') || value.includes('\n') || value.includes('\r')){
-    throw new Error(`${name} contém espaços/quebras de linha. Cole a chave em uma única linha no Netlify.`);
+    throw new Error(`${name} contém espaços/quebras de linha. Cole a chave em uma única linha nas variáveis do site.`);
   }
   if(value.startsWith('sb_publishable_')){
-    throw new Error(`${name} recebeu uma publishable key. Para salvar no banco, use a service_role/secret key no Netlify.`);
+    throw new Error(`${name} recebeu uma publishable key. Para salvar no banco, use a service_role/secret key nas variáveis do site.`);
   }
 
   return createClient(url, value, {
@@ -94,7 +94,7 @@ exports.handler = async (event) => {
   try{
     const query = event.queryStringParameters || {};
     if(event.httpMethod === 'GET' && query.health === '1'){
-      return response(200, { ok:true, env:describeSupabaseEnv(), note:'Não mostra chaves completas. Use para diagnosticar variáveis do Netlify.' });
+      return response(200, { ok:true, env:describeSupabaseEnv(), note:'Não mostra chaves completas. Use para diagnosticar as variáveis do ambiente.' });
     }
 
     const db = supabase();
@@ -166,7 +166,7 @@ exports.handler = async (event) => {
         }, { onConflict:'key' });
       }catch(e){ /* config table is optional */ }
       try{
-        await db.from('step_obras_history').insert({ action:'map_save', new_data:{ items:saved, mapZoom:body.mapZoom }, actor_name:'netlify_panel' });
+        await db.from('step_obras_history').insert({ action:'map_save', new_data:{ items:saved, mapZoom:body.mapZoom }, actor_name:'step_panel' });
       }catch(e){ /* history is optional */ }
       return response(200, { ok:true, saved: saved.length });
     }
@@ -176,7 +176,7 @@ exports.handler = async (event) => {
       if(!payload.id) return response(400, { ok:false, error:'Item sem ID.' });
       const { data, error } = await db.from('step_obras_items').upsert(payload, { onConflict:'id' }).select('*').single();
       if(error) throw error;
-      try{ await db.from('step_obras_history').insert({ item_id:payload.id, action:'item_save', new_data:payload, actor_name:'netlify_panel' }); }catch(e){}
+      try{ await db.from('step_obras_history').insert({ item_id:payload.id, action:'item_save', new_data:payload, actor_name:'step_panel' }); }catch(e){}
       return response(200, { ok:true, item:data });
     }
 
@@ -208,7 +208,7 @@ exports.handler = async (event) => {
         tipo:'Evidência'
       }).select('*').single();
       if(insertError) throw insertError;
-      try{ await db.from('step_obras_history').insert({ item_id:itemId, action:'photo_upload', new_data:inserted, actor_name:'netlify_panel' }); }catch(e){}
+      try{ await db.from('step_obras_history').insert({ item_id:itemId, action:'photo_upload', new_data:inserted, actor_name:'step_panel' }); }catch(e){}
       return response(200, { ok:true, photo:inserted });
     }
 
@@ -229,7 +229,7 @@ exports.handler = async (event) => {
     console.error(error);
     const message = error.message || 'Erro interno.';
     const hint = /Invalid API key/i.test(message)
-      ? 'Chave Supabase inválida no Netlify. Verifique se SUPABASE_SERVICE_ROLE_KEY é a service_role/secret key correta do projeto e não a publishable/anon key. Depois faça redeploy.'
+      ? 'Chave Supabase inválida no ambiente do site. Verifique se SUPABASE_SERVICE_ROLE_KEY é a service_role/secret key correta do projeto e não a publishable/anon key. Depois publique novamente.'
       : undefined;
     return response(500, { ok:false, error:message, hint });
   }

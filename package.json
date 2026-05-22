@@ -1,11 +1,11 @@
 {
-  "name": "step-painel-obras-netlify",
-  "version": "14.0.0",
+  "name": "step-painel-obras",
+  "version": "16.0.0",
   "private": true,
-  "description": "Painel HTML STEP Obras e Melhorias para GitHub + Netlify",
+  "description": "Painel Online STEP Obras e Melhorias",
   "scripts": {
     "start": "npx serve .",
-    "check": "node --check netlify/functions/obras.js && node -e \"console.log('HTML pronto para Netlify + Supabase')\""
+    "check": "node --check functions/obras.js && node -e \"console.log('Painel pronto para publicacao online + Supabase')\""
   },
   "dependencies": {
     "@supabase/supabase-js": "^2.86.0"

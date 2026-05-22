@@ -1,5 +1,5 @@
 -- STEP Painel Obras - Patch v11
--- Use se o banco ainda não tiver a estrutura completa para salvar mapa, itens e fotos via Netlify Functions.
+-- Use se o banco ainda não tiver a estrutura completa para salvar mapa, itens e fotos via função segura do site.
 
 create extension if not exists pgcrypto;
 
