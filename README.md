@@ -83,3 +83,10 @@ A pasta `supabase/` contém um modelo inicial de banco para essa próxima etapa.
 - Agora a imagem principal troca ao clicar em qualquer miniatura.
 - A miniatura ativa fica destacada.
 - Mantidos zoom da planta, movimentação dos marcadores e atualização da obra.
+
+
+## v11 - Salvamento do mapa
+
+A versão v11 inclui Netlify Function em `netlify/functions/obras.js`. Depois de configurar as variáveis do Supabase no Netlify, use o botão **Salvar mapa** para gravar as posições dos números da planta no banco.
+
+Se abrir em navegador anônimo, o site busca as posições no Supabase e não depende mais do `localStorage` daquele navegador.
