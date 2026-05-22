@@ -1,5 +1,9 @@
 # STEP | Painel Online de Obras e Melhorias
 
+Versão v9: clique 1x no número da planta para selecionar; clique 2x para abrir o pop-up com imagens.
+
+# STEP | Painel Online de Obras e Melhorias
+
 Versão preparada para hospedar no **GitHub** e visualizar pelo **Netlify**.
 
 O painel é uma aplicação HTML estática com:
@@ -73,7 +77,7 @@ A pasta `supabase/` contém um modelo inicial de banco para essa próxima etapa.
 
 
 
-## Versão v8 - correção pop-up de imagens
+## Versão v9 - clique simples seleciona / clique duplo abre pop-upns
 
 - Corrigido clique nas miniaturas dentro do pop-up da obra.
 - Agora a imagem principal troca ao clicar em qualquer miniatura.

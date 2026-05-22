@@ -276,7 +276,7 @@
         <div class="map-shell">
           <div class="card map-card">
             <div class="map-head">
-              <div><h3 style="margin:0">Mapa interativo da planta STEP</h3><p style="margin:5px 0 0;color:var(--muted);font-size:12px">Clique em um número para abrir o status. Use <b>Ajustar posições</b> para arrastar os marcadores que estiverem fora do lugar.</p></div>
+              <div><h3 style="margin:0">Mapa interativo da planta STEP</h3><p style="margin:5px 0 0;color:var(--muted);font-size:12px">Clique 1x em um número para selecionar. Clique 2x para abrir o pop-up da obra. Use <b>Ajustar posições</b> para arrastar os marcadores.</p></div>
               <div class="map-tools">
                 <button class="btn" onclick="zoomMap(-0.15)">− Zoom</button>
                 <span class="pill zoom-pill" id="zoomLabel">100%</span>
@@ -452,6 +452,7 @@
     const MAP_BASE_WIDTH = 1400;
     let dragState = null;
     let suppressMarkerClick = false;
+    let markerClickState = { id:null, time:0 };
 
     function loadState(){
       try{
@@ -727,6 +728,20 @@
         if(active) el.setAttribute('aria-current','true'); else el.removeAttribute('aria-current');
       });
     }
+    function handleMarkerClick(ev,id){
+      if(suppressMarkerClick){ ev.preventDefault(); return; }
+      ev.preventDefault();
+      const now = Date.now();
+      const isSecondClick = markerClickState.id === id && (now - markerClickState.time) <= 450;
+      selectedId = id;
+      renderMap();
+      if(isSecondClick && !mapMoveMode){
+        markerClickState = { id:null, time:0 };
+        openWorkPreview(id);
+        return;
+      }
+      markerClickState = { id, time: now };
+    }
     function renderMap(){
       const map=document.getElementById('mapInner');
       const stage=document.querySelector('.map-stage');
@@ -741,18 +756,14 @@
         btn.title=mapMoveMode ? `Arraste para reposicionar: ${i.id} - ${i.title}` : `${i.id} - ${i.title}`;
         btn.textContent=i.id;
         btn.onpointerdown=(ev)=>startMarkerDrag(ev,i.id);
-        btn.onclick=(ev)=>{
-          if(suppressMarkerClick){ev.preventDefault(); return;}
-          selectedId=i.id; renderMap();
-          if(!mapMoveMode) openWorkPreview(i.id);
-        };
+        btn.onclick=(ev)=>handleMarkerClick(ev,i.id);
         map.appendChild(btn);
       });
       const i=getItem(selectedId) || state.items[0]; if(!i) return;
       const photos=(state.photos||{})[i.id]||[];
       document.getElementById('mapDetail').innerHTML=`
         <div class="big-item"><div class="item-badge" style="background:${statusColor(i.status)}">${i.id}</div><div><h3>${escapeHtml(i.title)}</h3><div class="meta">${escapeHtml(i.area)} · ${escapeHtml(i.owner||'A definir')}</div></div></div>
-        ${mapMoveMode ? '<div class="map-help"><b>Modo ajuste ativo:</b> arraste qualquer número sobre a planta. Ao soltar, a nova posição é salva automaticamente.</div>' : '<div class="map-help"><b>Dica:</b> clique em qualquer número da planta para abrir o pop-up com imagens, status e avanço da obra. Use Ctrl + roda do mouse ou os botões de zoom para aproximar/afastar.</div>'}
+        ${mapMoveMode ? '<div class="map-help"><b>Modo ajuste ativo:</b> arraste qualquer número sobre a planta. Ao soltar, a nova posição é salva automaticamente.</div>' : '<div class="map-help"><b>Dica:</b> clique 1x no número da planta para selecionar e ver o resumo lateral. Clique 2x no mesmo número para abrir o pop-up com imagens, status e avanço. Use Ctrl + roda do mouse ou os botões de zoom para aproximar/afastar.</div>'}
         <span class="status-pill pill" style="background:${statusColor(i.status)};margin-top:12px">${i.status}</span>
         <div style="margin:16px 0"><div class="mini-progress"><div class="progress-track"><div class="progress-fill" style="width:${i.progress}%;background:${statusColor(i.status)}"></div></div><b>${fmtPct(i.progress)}</b></div></div>
         <div class="detail-list">
