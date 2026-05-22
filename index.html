@@ -231,7 +231,7 @@
       <nav class="nav" id="nav"></nav>
       <div class="side-note">
         <b>Uso sugerido:</b><br>
-        Atualize status, avanço e evidências. As alterações ficam salvas neste navegador. Para compartilhar com outra pessoa, use <b>Exportar dados</b>.
+        Atualize status, avanço, mapa e evidências. As alterações podem ser salvas no Supabase para todos visualizarem no Netlify.
       </div>
     </aside>
     <main>
@@ -239,7 +239,7 @@
       <div class="topbar">
         <div class="title">
           <h2 id="pageTitle">Painel Executivo de Obras e Melhorias</h2>
-          <p>Controle visual da carteira de melhorias da base STEP, com status das obras, avanço físico, custos, pendências e evidências fotográficas por item da planta. Versão preparada para GitHub + Netlify.</p>
+          <p>Controle visual da carteira de melhorias da base STEP, com status das obras, avanço físico, custos, pendências e evidências fotográficas por item da planta. Versão v13 preparada para GitHub + Netlify + edição direta sem PIN.</p>
         </div>
         <div class="actions">
           <button class="btn" onclick="print()">🖨️ Imprimir</button>
@@ -334,7 +334,8 @@
       <section class="section" id="sec-config">
         <div class="conf-grid">
           <div class="card conf-card"><h3>Como usar</h3><p>Este painel está preparado para Netlify + Supabase. Abra o site, clique em <b>Ajustar posições</b>, arraste os números da planta e depois clique em <b>Salvar mapa</b> para gravar as posições no banco. Assim, ao abrir em navegador anônimo ou em outro computador, o mapa carrega as posições salvas no Supabase.</p><p>Para publicar online, suba esta pasta no GitHub e conecte no Netlify. O arquivo principal é o index.html.</p></div>
-          <div class="card conf-card"><h3>Próxima evolução recomendada</h3><p>A versão v11 já inclui funções Netlify para sincronizar dados com Supabase: leitura da carteira, salvamento das posições do mapa, atualização de obra e envio de imagens para o Storage. Configure as variáveis de ambiente no Netlify para ativar a sincronização.</p><div class="code">Módulos futuros:\n- Login por perfil\n- Banco de dados central\n- Upload de fotos por obra\n- Histórico de alteração por usuário\n- Aprovação por responsável\n- Exportação PDF executiva</div></div>
+          <div class="card conf-card"><h3>Próxima evolução recomendada</h3><p>A versão v12 já inclui funções Netlify para sincronizar dados com Supabase: leitura da carteira, salvamento das posições do mapa, atualização de obra e envio de imagens para o Storage. Configure as variáveis de ambiente no Netlify para ativar a sincronização.</p><div class="code">Módulos futuros:\n- Login por perfil\n- Banco de dados central\n- Upload de fotos por obra\n- Histórico de alteração por usuário\n- Aprovação por responsável\n- Exportação PDF executiva</div></div>
+          <div class="card conf-card"><h3>Edição direta</h3><p>Esta versão não solicita PIN. Ao clicar em <b>Salvar mapa</b>, <b>Atualizar obra</b> ou incluir imagens, o painel grava diretamente no Supabase através da função segura do Netlify.</p><span class="pill">Sem PIN</span></div>
           <div class="card conf-card"><h3>Reset local</h3><p>Use somente se quiser voltar ao estado original do modelo e apagar atualizações deste navegador.</p><button class="btn danger" onclick="resetState()">Apagar dados locais e restaurar modelo</button></div>
           <div class="card conf-card"><h3>Observação importante</h3><p>Como é uma solução HTML local, imagens muito grandes são comprimidas antes de salvar. Mesmo assim, navegadores têm limite de armazenamento. Para muitos anexos, recomendo migrar o armazenamento das fotos para nuvem.</p></div>
         </div>
@@ -459,7 +460,6 @@
     let mapDirty = false;
     let remoteOnline = false;
     const API_URL = '/.netlify/functions/obras';
-    const PIN_STORAGE_KEY = 'step_obras_admin_pin';
 
     function loadState(){
       try{
@@ -506,14 +506,18 @@
         btn.textContent = mapDirty ? '💾 Salvar mapa*' : '💾 Salvar mapa';
       }
     }
-    function getAdminPin(){
-      let pin = sessionStorage.getItem(PIN_STORAGE_KEY) || localStorage.getItem(PIN_STORAGE_KEY) || '';
-      if(!pin){
-        pin = prompt('Digite o PIN de edição da STEP para salvar no banco:') || '';
-        pin = pin.trim();
-        if(pin){ sessionStorage.setItem(PIN_STORAGE_KEY, pin); localStorage.setItem(PIN_STORAGE_KEY, pin); }
-      }
-      return pin;
+    async function apiPost(payload){
+      const res = await fetch(API_URL, {
+        method:'POST',
+        headers:{'Content-Type':'application/json'},
+        body:JSON.stringify(payload)
+      });
+      const data = await res.json().catch(()=>({}));
+      if(!res.ok) throw new Error(data.error || `Erro HTTP ${res.status}`);
+      return data;
+    }
+    async function apiPostAuthorized(payload){
+      return apiPost(payload);
     }
     function normalizeServerItem(row){
       return {
@@ -549,16 +553,6 @@
       });
       return photos;
     }
-    async function apiPost(payload){
-      const res = await fetch(API_URL, {
-        method:'POST',
-        headers:{'Content-Type':'application/json'},
-        body:JSON.stringify(payload)
-      });
-      const data = await res.json().catch(()=>({}));
-      if(!res.ok) throw new Error(data.error || `Erro HTTP ${res.status}`);
-      return data;
-    }
     async function loadFromServer(manual=false){
       try{
         updateMapSyncPill('Carregando banco...');
@@ -588,16 +582,14 @@
       }
     }
     async function saveMapToServer(){
-      const pin = getAdminPin();
       try{
         updateMapSyncPill('Salvando mapa...');
         const payload = {
           action:'save_map',
-          pin,
           mapZoom,
           items: state.items.map(i=>({id:i.id, x:Number(i.x)||50, y:Number(i.y)||50}))
         };
-        await apiPost(payload);
+        await apiPostAuthorized(payload);
         remoteOnline = true;
         mapDirty = false;
         state.updatedAt = new Date().toISOString();
@@ -610,10 +602,8 @@
       }
     }
     async function saveItemToServer(item){
-      const pin = getAdminPin();
-      if(!pin) return false;
       try{
-        await apiPost({action:'save_item', pin, item});
+        await apiPostAuthorized({action:'save_item', item});
         remoteOnline = true;
         updateMapSyncPill();
         showToast(`Item ${escapeHtml(item.id)} salvo também no Supabase.`);
@@ -624,10 +614,9 @@
       }
     }
     async function savePhotoToServer(itemId, photo){
-      const pin = getAdminPin();
-      if(!pin || !photo?.data?.startsWith('data:')) return false;
+      if(!photo?.data?.startsWith('data:')) return false;
       try{
-        const data = await apiPost({action:'upload_photo', pin, itemId, photo:{name:photo.name, dataUrl:photo.data}});
+        const data = await apiPostAuthorized({action:'upload_photo', itemId, photo:{name:photo.name, dataUrl:photo.data}});
         if(data.photo){
           Object.assign(photo, {
             id:data.photo.id,
@@ -644,9 +633,8 @@
       return false;
     }
     async function deletePhotoFromServer(photo){
-      const pin = getAdminPin();
-      if(!pin || !photo?.id) return false;
-      try{ await apiPost({action:'delete_photo', pin, photoId:photo.id, storagePath:photo.storage_path}); return true; }
+      if(!photo?.id) return false;
+      try{ await apiPostAuthorized({action:'delete_photo', photoId:photo.id, storagePath:photo.storage_path}); return true; }
       catch(err){ showToast(`Foto removida localmente, mas não consegui remover do banco: ${escapeHtml(err.message)}`); return false; }
     }
     async function bootstrapPanel(){

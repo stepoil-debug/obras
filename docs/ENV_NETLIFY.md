@@ -11,3 +11,13 @@ NODE_ENV=production
 ```
 
 A chave `SUPABASE_SERVICE_ROLE_KEY` é secreta. Não salve essa chave no GitHub.
+
+
+## Correção v12 - PIN inválido
+
+Se o painel informar PIN inválido, confira se a variável `STEP_ADMIN_PIN` está cadastrada no Netlify exatamente igual ao PIN digitado no painel. Depois de alterar variável no Netlify, faça redeploy. No painel, use o botão `Trocar PIN` para apagar o PIN antigo salvo no navegador.
+
+
+## v13 sem PIN
+
+`STEP_ADMIN_PIN` não é usado nesta versão. Pode remover do Netlify.

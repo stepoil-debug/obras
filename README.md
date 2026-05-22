@@ -85,8 +85,13 @@ A pasta `supabase/` contém um modelo inicial de banco para essa próxima etapa.
 - Mantidos zoom da planta, movimentação dos marcadores e atualização da obra.
 
 
-## v11 - Salvamento do mapa
+## v12 - Salvamento do mapa
 
-A versão v11 inclui Netlify Function em `netlify/functions/obras.js`. Depois de configurar as variáveis do Supabase no Netlify, use o botão **Salvar mapa** para gravar as posições dos números da planta no banco.
+A versão v12 inclui Netlify Function em `netlify/functions/obras.js`. Depois de configurar as variáveis do Supabase no Netlify, use o botão **Salvar mapa** para gravar as posições dos números da planta no banco.
 
 Se abrir em navegador anônimo, o site busca as posições no Supabase e não depende mais do `localStorage` daquele navegador.
+
+
+## Versão v13 - sem PIN
+
+Nesta versão, o painel salva diretamente no Supabase sem pedir PIN. A variável `STEP_ADMIN_PIN` não é necessária. Mantenha `SUPABASE_SERVICE_ROLE_KEY` somente nas variáveis do Netlify e nunca no GitHub.

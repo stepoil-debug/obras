@@ -23,11 +23,6 @@ function supabase(){
   });
 }
 
-function authorize(body){
-  const configuredPin = process.env.STEP_ADMIN_PIN || '';
-  if(!configuredPin) return true;
-  return String(body?.pin || '') === String(configuredPin);
-}
 
 function cleanItem(item = {}){
   return {
@@ -99,7 +94,10 @@ exports.handler = async (event) => {
     if(event.httpMethod !== 'POST') return response(405, { ok:false, error:'Método não permitido.' });
 
     const body = event.body ? JSON.parse(event.body) : {};
-    if(!authorize(body)) return response(401, { ok:false, error:'PIN de edição inválido.' });
+
+    if(body.action === 'check_pin'){
+      return response(200, { ok:true, message:'Edição direta habilitada. Sem PIN.' });
+    }
 
     if(body.action === 'save_map'){
       const items = Array.isArray(body.items) ? body.items : [];

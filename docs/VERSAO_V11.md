@@ -1,4 +1,4 @@
-# Versão v11 - Salvar mapa no Supabase
+# Versão v12 - Salvar mapa no Supabase
 
 Esta versão adiciona sincronização real com Supabase via Netlify Functions.
 
