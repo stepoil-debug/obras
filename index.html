@@ -176,8 +176,10 @@
     .work-preview-gallery{display:grid;grid-template-columns:repeat(auto-fill,minmax(138px,1fr));gap:10px;margin-top:12px}
     .work-preview-thumb{border:1px solid var(--line);border-radius:16px;overflow:hidden;background:rgba(255,255,255,.045);padding:0;text-align:left;color:inherit;cursor:zoom-in;transition:.18s ease}
     .work-preview-thumb:hover{transform:translateY(-1px);background:rgba(255,255,255,.08)}
+    .work-preview-thumb.active{border-color:#fff;box-shadow:0 0 0 3px rgba(59,163,255,.35);background:rgba(59,163,255,.14)}
     .work-preview-thumb img{width:100%;height:96px;object-fit:cover;background:#fff;display:block}
     .work-preview-thumb span{display:block;padding:8px;color:var(--muted);font-size:11px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+    .work-preview-caption{margin:9px 2px 0;color:var(--muted);font-size:12px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
     .work-preview-titleline{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:12px}
     .work-preview-titleline h4{margin:0;font-size:15px}.work-preview-titleline small{color:var(--muted);font-size:11px}
 
@@ -666,10 +668,13 @@
       workPreviewTitle.textContent=`${id} · ${item.title}`;
       workPreviewSub.textContent=`${item.area} · ${item.owner||'A definir'} · ${photos.length} foto${photos.length===1?'':'s'}`;
       const hero = photos.length
-        ? `<button onclick="openPhotoPreview(${jsArg(id)},0)" title="Ampliar imagem"><img src="${photos[0].data}" alt="${escapeHtml(photos[0].name)}"></button>`
+        ? `<button id="workPreviewHeroBtn" onclick="openPhotoPreview(${jsArg(id)},0)" title="Ampliar imagem"><img id="workPreviewHeroImg" src="${photos[0].data}" alt="${escapeHtml(photos[0].name)}"></button>`
         : `<div class="work-preview-empty"><b>Nenhuma imagem anexada nesta obra.</b><br>Use o botão <b>Atualizar obra</b> para incluir fotos, evidências ou projeto.</div>`;
+      const caption = photos.length
+        ? `<div class="work-preview-caption" id="workPreviewCaption">1/${photos.length} · ${escapeHtml(photos[0].name)}</div>`
+        : '';
       const thumbs = photos.length > 1
-        ? `<div class="work-preview-gallery">${photos.map((p,idx)=>`<button class="work-preview-thumb" onclick="openPhotoPreview(${jsArg(id)},${idx})"><img src="${p.data}" alt="${escapeHtml(p.name)}"><span>${escapeHtml(p.name)}</span></button>`).join('')}</div>`
+        ? `<div class="work-preview-gallery">${photos.map((p,idx)=>`<button class="work-preview-thumb ${idx===0?'active':''}" data-preview-thumb="${idx}" onclick="selectWorkPreviewPhoto(${jsArg(id)},${idx})"><img src="${p.data}" alt="${escapeHtml(p.name)}"><span>${escapeHtml(p.name)}</span></button>`).join('')}</div>`
         : '';
       workPreviewBody.innerHTML=`
         <div class="work-preview-info">
@@ -688,12 +693,29 @@
           ${item.notes ? `<div class="detail-list" style="margin-top:10px"><div style="display:block"><span>Observações</span><b style="display:block;text-align:left;margin-top:6px">${escapeHtml(item.notes)}</b></div></div>` : ''}
         </div>
         <div class="work-preview-media">
-          <div class="work-preview-titleline"><div><h4>Imagens da obra</h4><small>Visualização ampliada do item selecionado na planta.</small></div><span class="pill">${photos.length} foto${photos.length===1?'':'s'}</span></div>
+          <div class="work-preview-titleline"><div><h4>Imagens da obra</h4><small>Clique nas miniaturas para trocar a imagem principal. Clique na imagem grande para ampliar.</small></div><span class="pill">${photos.length} foto${photos.length===1?'':'s'}</span></div>
           <div class="work-preview-hero">${hero}</div>
+          ${caption}
           ${thumbs}
         </div>`;
       document.getElementById('workPreviewEditBtn').onclick=()=>{workPreview.close(); openModal(id);};
       if(!workPreview.open) workPreview.showModal();
+    }
+    function selectWorkPreviewPhoto(id, idx){
+      const photos=(state.photos||{})[id]||[];
+      const p=photos[idx];
+      if(!p) return;
+      const img=document.getElementById('workPreviewHeroImg');
+      const btn=document.getElementById('workPreviewHeroBtn');
+      const caption=document.getElementById('workPreviewCaption');
+      if(img){ img.src=p.data; img.alt=p.name||'Imagem da obra'; }
+      if(btn){ btn.onclick=()=>openPhotoPreview(id, idx); }
+      if(caption){ caption.textContent=`${idx+1}/${photos.length} · ${p.name||'Imagem da obra'}`; }
+      document.querySelectorAll('#workPreview .work-preview-thumb').forEach(el=>{
+        const active=Number(el.dataset.previewThumb)===idx;
+        el.classList.toggle('active', active);
+        if(active) el.setAttribute('aria-current','true'); else el.removeAttribute('aria-current');
+      });
     }
     function renderMap(){
       const map=document.getElementById('mapInner');
