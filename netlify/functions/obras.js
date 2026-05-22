@@ -12,15 +12,54 @@ function response(statusCode, body){
 }
 
 function requiredEnv(name){
-  const value = process.env[name];
+  const value = (process.env[name] || '').trim();
   if(!value) throw new Error(`Variável de ambiente ausente: ${name}`);
   return value;
 }
 
+function getSupabaseKey(){
+  // Para gravação pelo Netlify, use a chave secreta/service_role.
+  // Aceita estes nomes para evitar erro de configuração no Netlify.
+  const candidates = [
+    'SUPABASE_SERVICE_ROLE_KEY',
+    'SUPABASE_SECRET_KEY',
+    'SUPABASE_SERVICE_KEY'
+  ];
+  for(const name of candidates){
+    const value = (process.env[name] || '').trim();
+    if(value) return { name, value };
+  }
+  throw new Error('Variável de ambiente ausente: SUPABASE_SERVICE_ROLE_KEY. Cadastre a chave service_role/secret no Netlify.');
+}
+
 function supabase(){
-  return createClient(requiredEnv('SUPABASE_URL'), requiredEnv('SUPABASE_SERVICE_ROLE_KEY'), {
+  const url = requiredEnv('SUPABASE_URL');
+  const { name, value } = getSupabaseKey();
+
+  // Erros comuns: colar publishable/anon no lugar da service_role, colar a chave quebrada, ou inserir aspas/espaços.
+  if(value.includes(' ') || value.includes('\n') || value.includes('\r')){
+    throw new Error(`${name} contém espaços/quebras de linha. Cole a chave em uma única linha no Netlify.`);
+  }
+  if(value.startsWith('sb_publishable_')){
+    throw new Error(`${name} recebeu uma publishable key. Para salvar no banco, use a service_role/secret key no Netlify.`);
+  }
+
+  return createClient(url, value, {
     auth: { persistSession: false }
   });
+}
+
+function describeSupabaseEnv(){
+  const url = (process.env.SUPABASE_URL || '').trim();
+  const keyNames = ['SUPABASE_SERVICE_ROLE_KEY','SUPABASE_SECRET_KEY','SUPABASE_SERVICE_KEY','SUPABASE_BUCKET'];
+  return {
+    supabaseUrlSet: Boolean(url),
+    supabaseUrlHost: url ? url.replace(/^https?:\/\//,'').split('/')[0] : null,
+    keys: Object.fromEntries(keyNames.map((name) => {
+      const v = (process.env[name] || '').trim();
+      return [name, { set:Boolean(v), length:v.length, prefix:v ? v.slice(0, 14) + '...' : null }];
+    }))
+  };
 }
 
 
@@ -53,6 +92,11 @@ exports.handler = async (event) => {
   if(event.httpMethod === 'OPTIONS') return response(204, {});
 
   try{
+    const query = event.queryStringParameters || {};
+    if(event.httpMethod === 'GET' && query.health === '1'){
+      return response(200, { ok:true, env:describeSupabaseEnv(), note:'Não mostra chaves completas. Use para diagnosticar variáveis do Netlify.' });
+    }
+
     const db = supabase();
 
     if(event.httpMethod === 'GET'){
@@ -183,6 +227,10 @@ exports.handler = async (event) => {
     return response(400, { ok:false, error:'Ação inválida.' });
   }catch(error){
     console.error(error);
-    return response(500, { ok:false, error:error.message || 'Erro interno.' });
+    const message = error.message || 'Erro interno.';
+    const hint = /Invalid API key/i.test(message)
+      ? 'Chave Supabase inválida no Netlify. Verifique se SUPABASE_SERVICE_ROLE_KEY é a service_role/secret key correta do projeto e não a publishable/anon key. Depois faça redeploy.'
+      : undefined;
+    return response(500, { ok:false, error:message, hint });
   }
 };

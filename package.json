@@ -1,6 +1,6 @@
 {
   "name": "step-painel-obras-netlify",
-  "version": "11.0.0",
+  "version": "14.0.0",
   "private": true,
   "description": "Painel HTML STEP Obras e Melhorias para GitHub + Netlify",
   "scripts": {
