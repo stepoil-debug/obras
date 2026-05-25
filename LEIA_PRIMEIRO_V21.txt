@@ -1,0 +1,12 @@
+STEP Painel Obras - V21 STATUS DE COMPRA CORRIGIDO
+
+Correções principais:
+1. O painel agora não usa mais a tabela resumida de 14 linhas quando o banco estiver incompleto.
+2. Se o Supabase ainda tiver custos resumidos/sem status, o painel mostra automaticamente a tabela completa embutida da planilha 25/05/26 com 311 linhas.
+3. Na aba Custos existe o botão "Sincronizar custos da planilha" para gravar as 311 linhas no Supabase.
+4. Os status de compra aparecem separados com valor e quantidade: Comprado, Em Orçamento, Em Processo, Cancelado e Orçamento não Aprovado.
+
+Como publicar:
+- Execute PUBLICAR_V21_STATUS_COMPRA_CORRIGIDO.cmd
+- Depois, no painel online, abra Custos e clique em "Sincronizar custos da planilha".
+- Alternativamente, rode no Supabase o SQL: supabase/RODAR_ESTE_SQL_V21_STATUS_COMPRA_CORRIGIDO.sql
