@@ -139,8 +139,8 @@
     .map-shell{display:grid;grid-template-columns:minmax(0,1fr) 360px;gap:16px;align-items:start}
     .map-card{overflow:hidden;padding:0;position:relative}
     .map-head{padding:16px 18px;border-bottom:1px solid var(--line);display:flex;justify-content:space-between;gap:10px;align-items:center}
-    .map-stage{position:relative;background:#eef3f8;overflow:auto;max-height:78vh;scroll-behavior:smooth}
-    .map-inner{position:relative; width:var(--map-width,1400px); max-width:none; min-width:640px; margin:auto; transition:width .18s ease;}
+    .map-stage{position:relative;background:#eef3f8;overflow:auto;max-height:78vh;min-height:420px;scroll-behavior:smooth;overscroll-behavior:contain}
+    .map-inner{position:relative; width:var(--map-width,100%); max-width:none; min-width:0; margin:0 auto; transition:width .18s ease;}
     .map-inner img{display:block; width:100%; height:auto; user-select:none;}
     .marker{
       position:absolute; width:32px; height:32px; transform:translate(-50%,-50%); border-radius:50%; border:3px solid #fff;
@@ -232,7 +232,7 @@
     .table-wrap.compact td,.table-wrap.compact th{padding:10px 10px}
     @media (max-width: 1250px){.kpis{grid-template-columns:repeat(3,1fr)}.layout-2,.map-shell{grid-template-columns:1fr}.map-detail{order:-1}.map-stage{max-height:none}.modal-body{grid-template-columns:1fr}.work-preview-wrap{grid-template-columns:1fr}}
     @media (max-width: 780px){aside{display:none}.mobile-nav{display:block}.topbar{display:block}.actions{justify-content:flex-start;margin-top:15px}.kpis,.layout-3,.conf-grid{grid-template-columns:1fr}.title h2{font-size:23px}main{padding:16px}.card{padding:15px}.bar-row{grid-template-columns:1fr}.map-photo-grid{grid-template-columns:1fr}.modal-body{padding:15px}.form-grid{grid-template-columns:1fr}.table-tools .field{width:100%}}
-    @media (max-width: 780px){aside{display:none}.mobile-nav{display:block;position:sticky;top:0;z-index:30;background:rgba(7,17,31,.92);padding:8px 0}.topbar{display:block}.actions{justify-content:flex-start;margin-top:15px}.actions .btn{flex:1 1 150px}.kpis,.layout-3,.conf-grid{grid-template-columns:1fr}.title h2{font-size:23px}main{padding:12px}.card{padding:14px;border-radius:18px}.bar-row{grid-template-columns:1fr}.map-shell{grid-template-columns:1fr}.map-detail{order:-1}.map-head{display:block}.map-tools{justify-content:flex-start;margin-top:12px}.map-tools .btn{flex:1 1 120px}.map-stage{max-height:58vh;-webkit-overflow-scrolling:touch}.map-inner{width:920px;min-width:760px}.marker{width:38px;height:38px;font-size:12px;border-width:3px}.modal-body{padding:14px;grid-template-columns:1fr;max-height:72dvh}.modal-head{padding:14px}.modal-actions{padding:12px}.form-grid{grid-template-columns:1fr}.table-tools .field{width:100%}.cost-table-actions{justify-content:flex-start}.cost-table-actions .field{min-width:0;width:100%}.mobile-tip{display:block}.work-preview-dialog{width:98vw}.work-preview-wrap{grid-template-columns:1fr;padding:12px;max-height:74dvh}.work-preview-hero{min-height:220px}.work-preview-hero img{height:min(44vh,360px)}dialog{width:96vw;max-height:92dvh;border-radius:20px}.photo-preview-wrap{padding:12px}.dropzone{font-size:13px}.dropzone input{font-size:14px}}
+    @media (max-width: 780px){aside{display:none}.mobile-nav{display:block;position:sticky;top:0;z-index:30;background:rgba(7,17,31,.92);padding:8px 0}.topbar{display:block}.actions{justify-content:flex-start;margin-top:15px}.actions .btn{flex:1 1 150px}.kpis,.layout-3,.conf-grid{grid-template-columns:1fr}.title h2{font-size:23px}main{padding:12px}.card{padding:14px;border-radius:18px}.bar-row{grid-template-columns:1fr}.map-shell{grid-template-columns:1fr}.map-detail{order:-1}.map-head{display:block}.map-tools{justify-content:flex-start;margin-top:12px}.map-tools .btn{flex:1 1 120px}.map-stage{max-height:none;min-height:52vh;-webkit-overflow-scrolling:touch}.map-inner{width:var(--map-width,100%)!important;min-width:0!important}.marker{width:38px;height:38px;font-size:12px;border-width:3px}.modal-body{padding:14px;grid-template-columns:1fr;max-height:72dvh}.modal-head{padding:14px}.modal-actions{padding:12px}.form-grid{grid-template-columns:1fr}.table-tools .field{width:100%}.cost-table-actions{justify-content:flex-start}.cost-table-actions .field{min-width:0;width:100%}.mobile-tip{display:block}.work-preview-dialog{width:98vw}.work-preview-wrap{grid-template-columns:1fr;padding:12px;max-height:74dvh}.work-preview-hero{min-height:220px}.work-preview-hero img{height:min(44vh,360px)}dialog{width:96vw;max-height:92dvh;border-radius:20px}.photo-preview-wrap{padding:12px}.dropzone{font-size:13px}.dropzone input{font-size:14px}}
     @media print{body{background:#fff;color:#111}.app{display:block}aside,.mobile-nav,.actions,.table-tools,.btn,.marker{display:none!important}main{padding:0;max-width:none}.section{display:block!important;page-break-after:always}.card{box-shadow:none;background:#fff;color:#111;border:1px solid #ddd}.map-stage{max-height:none;overflow:visible}.map-inner{width:100%}th,td{color:#111}.title p,.kpi small,.muted{color:#555}.map-shell,.layout-2,.layout-3{grid-template-columns:1fr}.section:not(#sec-overview):not(#sec-map):not(#sec-costs){display:none!important}}
   </style>
 </head>
@@ -254,7 +254,7 @@
       <div class="topbar">
         <div class="title">
           <h2 id="pageTitle">Painel Executivo de Obras e Melhorias</h2>
-          <p>Controle visual da carteira de melhorias da base STEP, com status das obras, avanço físico, custos, pendências e evidências fotográficas por item da planta. Versão v21 - Painel Online STEP + Supabase, custos completos por status de compra, fallback da planilha 25/05/26 e sincronização da tabela de custos.</p>
+          <p>Controle visual da carteira de melhorias da base STEP, com status das obras, avanço físico, custos, pendências e evidências fotográficas por item da planta. Versão v22 - Painel Online STEP + Supabase, custos por status de compra e mapa responsivo corrigido para celular.</p>
         <div class="mobile-tip">No telefone: abra a obra, toque em <b>Atualizar obra</b> e use <b>Incluir imagens</b> para tirar foto ou anexar da galeria. A importação agora aceita Excel, CSV e JSON.</div></div>
         <div class="actions">
           <button class="btn" onclick="print()">🖨️ Imprimir</button>
@@ -296,7 +296,7 @@
                 <button class="btn" onclick="zoomMap(-0.15)">− Zoom</button>
                 <span class="pill zoom-pill" id="zoomLabel">100%</span>
                 <button class="btn" onclick="zoomMap(0.15)">+ Zoom</button>
-                <button class="btn" onclick="resetMapZoom()">100%</button>
+                <button class="btn" onclick="resetMapZoom()">100%</button><button class="btn" onclick="fitMapToScreen()">Ajustar tela</button>
                 <button class="btn" id="moveModeBtn" onclick="toggleMoveMode()">✥ Ajustar posições</button>
                 <button class="btn primary" id="saveMapBtn" onclick="saveMapToServer()">💾 Salvar mapa</button>
                 <button class="btn" onclick="loadFromServer(true)">↻ Recarregar banco</button>
@@ -1005,26 +1005,47 @@
       await loadFromServer(false);
     }
 
-    function applyMapZoom(keepCenter=false){
-      const map=document.getElementById('mapInner');
+    function getMapFitWidth(){
       const stage=document.querySelector('.map-stage');
-      const prevW=map?.getBoundingClientRect().width || MAP_BASE_WIDTH;
-      const prevH=map?.getBoundingClientRect().height || prevW*0.7;
-      const centerX=stage ? stage.scrollLeft + stage.clientWidth/2 : 0;
-      const centerY=stage ? stage.scrollTop + stage.clientHeight/2 : 0;
-      mapZoom = clamp(mapZoom, .55, 2.5);
-      if(map) map.style.setProperty('--map-width', `${Math.round(MAP_BASE_WIDTH*mapZoom)}px`);
-      const label=document.getElementById('zoomLabel');
-      if(label) label.textContent=`${Math.round(mapZoom*100)}%`;
-      if(keepCenter && stage && map){
-        requestAnimationFrame(()=>{
-          const rect=map.getBoundingClientRect();
+      if(!stage) return MAP_BASE_WIDTH;
+      const available = Math.max(280, stage.clientWidth - 18);
+      return Math.min(MAP_BASE_WIDTH, available);
+    }
+    function alignMapToViewport(stage, map, keepCenter, prevW, prevH, centerX, centerY){
+      if(!stage || !map) return;
+      requestAnimationFrame(()=>{
+        const rect=map.getBoundingClientRect();
+        if(keepCenter){
           const rx=prevW ? rect.width/prevW : 1;
           const ry=prevH ? rect.height/prevH : rx;
           stage.scrollLeft = Math.max(0, centerX*rx - stage.clientWidth/2);
           stage.scrollTop = Math.max(0, centerY*ry - stage.clientHeight/2);
-        });
-      }
+        }
+        // Quando a planta cabe na tela, força o início da visualização.
+        // Isso evita abrir no celular mostrando só metade do desenho por scroll antigo/cache.
+        if(rect.width <= stage.clientWidth + 6) stage.scrollLeft = 0;
+        if(rect.height <= stage.clientHeight + 6) stage.scrollTop = 0;
+        if(!keepCenter && !stage.dataset.initialMapAligned){
+          stage.scrollLeft = 0;
+          stage.scrollTop = 0;
+          stage.dataset.initialMapAligned='1';
+        }
+      });
+    }
+    function applyMapZoom(keepCenter=false){
+      const map=document.getElementById('mapInner');
+      const stage=document.querySelector('.map-stage');
+      const prevW=map?.getBoundingClientRect().width || getMapFitWidth();
+      const prevH=map?.getBoundingClientRect().height || prevW*0.7;
+      const centerX=stage ? stage.scrollLeft + stage.clientWidth/2 : 0;
+      const centerY=stage ? stage.scrollTop + stage.clientHeight/2 : 0;
+      mapZoom = clamp(mapZoom, .55, 2.5);
+      const fitWidth = getMapFitWidth();
+      const targetWidth = Math.max(280, Math.round(fitWidth * mapZoom));
+      if(map) map.style.setProperty('--map-width', `${targetWidth}px`);
+      const label=document.getElementById('zoomLabel');
+      if(label) label.textContent=`${Math.round(mapZoom*100)}%`;
+      alignMapToViewport(stage, map, keepCenter, prevW, prevH, centerX, centerY);
     }
     function setMapZoom(value, keepCenter=true){
       mapZoom = clamp(value, .55, 2.5);
@@ -1033,7 +1054,13 @@
       applyMapZoom(keepCenter);
     }
     function zoomMap(delta){setMapZoom(mapZoom + Number(delta||0), true);}
-    function resetMapZoom(){setMapZoom(1, true); showToast('Zoom da planta restaurado para 100%.');}
+    function resetMapZoom(){setMapZoom(1, false); showToast('Zoom da planta restaurado para 100% e ajustado à tela.');}
+    function fitMapToScreen(){
+      setMapZoom(1, false);
+      const stage=document.querySelector('.map-stage');
+      if(stage){ stage.scrollLeft=0; stage.scrollTop=0; stage.dataset.initialMapAligned='1'; }
+      showToast('Planta ajustada para aparecer inteira na tela.');
+    }
     function setupMapZoom(){
       const stage=document.querySelector('.map-stage');
       if(!stage || stage.dataset.zoomReady) return;
@@ -1044,6 +1071,7 @@
         const delta = ev.deltaY < 0 ? 0.10 : -0.10;
         zoomMap(delta);
       }, {passive:false});
+      window.addEventListener('resize', ()=>applyMapZoom(false));
     }
 
     function updateMapMoveButton(){

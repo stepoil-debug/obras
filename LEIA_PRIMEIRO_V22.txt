@@ -1,0 +1,14 @@
+VERSÃO V22 - MAPA RESPONSIVO CORRIGIDO
+
+Correções principais:
+- Planta não abre mais cortada/metade no celular.
+- Zoom agora usa a largura disponível da tela.
+- Botão novo: Ajustar tela.
+- Ao abrir no celular, o mapa alinha no início e evita scroll antigo/cache.
+- Mantém as posições dos marcadores salvas no Supabase.
+
+Para publicar:
+1. Extraia este ZIP.
+2. Execute PUBLICAR_V22_MAPA_RESPONSIVO.cmd.
+3. No Netlify, use Clear cache and deploy site.
+4. No celular, atualize com Ctrl+F5 no desktop ou limpe cache/reabra no celular.
