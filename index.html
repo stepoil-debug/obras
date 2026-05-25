@@ -254,11 +254,11 @@
       <div class="topbar">
         <div class="title">
           <h2 id="pageTitle">Painel Executivo de Obras e Melhorias</h2>
-          <p>Controle visual da carteira de melhorias da base STEP, com status das obras, avanço físico, custos, pendências e evidências fotográficas por item da planta. Versão v23 - Painel Online STEP + Supabase, custos por status de compra e mapa completo corrigido.</p>
+          <p>Controle visual da carteira de melhorias da base STEP, com status das obras, avanço físico, custos, pendências e evidências fotográficas por item da planta. Versão v25 - Painel Online STEP + Supabase, exportação Excel com abas iguais à planilha base.</p>
         <div class="mobile-tip">No telefone: abra a obra, toque em <b>Atualizar obra</b> e use <b>Incluir imagens</b> para tirar foto ou anexar da galeria. A importação agora aceita Excel, CSV e JSON.</div></div>
         <div class="actions">
           <button class="btn" onclick="print()">🖨️ Imprimir</button>
-          <button class="btn" onclick="exportState()">⬇️ Exportar dados</button>
+          <button class="btn" onclick="exportState()">📊 Exportar Excel</button>
           <label class="btn" for="importFile">⬆️ Importar Excel/JSON</label>
           <input id="importFile" type="file" accept=".json,.xlsx,.xls,.csv,application/json,application/vnd.openxmlformats-officedocument.spreadsheetml.sheet,application/vnd.ms-excel,text/csv" hidden />
           <button class="btn primary" onclick="openFirstCritical()">⚡ Ver crítico</button>
@@ -329,7 +329,7 @@
           <div class="card"><div class="panel-title"><div><h3>Custo por status de compra</h3><p>Separação entre comprado, em orçamento, cancelado, não aprovado e demais status.</p></div></div><div class="bar-list" id="costStatusBars"></div></div>
           <div class="card"><div class="panel-title"><div><h3>Custo por item da planta</h3><p>Ranking dos principais itens de melhoria por valor identificado.</p></div></div><div class="bar-list" id="itemCostBars"></div></div>
         </div>
-        <div class="card" style="margin-top:16px"><div class="panel-title"><div><h3>Tabela detalhada de custos</h3><p>Linhas importadas da aba <b>Custos x Execução</b>. Use a busca para localizar setor, fornecedor, produto, pedido ou status.</p></div><div class="cost-table-actions"><button class="btn primary" onclick="syncSeedCostsToServer()">↻ Sincronizar custos da planilha</button><input class="field" id="costSearch" placeholder="Buscar custo, fornecedor, setor ou pedido" /></div></div><div class="table-wrap compact"><table><thead><tr><th>Item</th><th>Setor</th><th>Cotação</th><th>Pedido</th><th>Fornecedor</th><th>Produto / descrição</th><th>Qtd.</th><th>Valor</th><th>Status compra</th><th>Disciplina</th></tr></thead><tbody id="costDetailBody"></tbody></table></div></div>
+        <div class="card" style="margin-top:16px"><div class="panel-title"><div><h3>Tabela detalhada de custos</h3><p>Dados importados da aba <b>Custos x Execução</b>. Use a busca para localizar setor, fornecedor, produto, pedido ou status.</p></div><div class="cost-table-actions"><button class="btn primary" onclick="syncSeedCostsToServer()">↻ Sincronizar custos da planilha</button><input class="field" id="costSearch" placeholder="Buscar custo, fornecedor, setor ou pedido" /></div></div><div class="table-wrap compact"><table><thead><tr><th>Item</th><th>Setor</th><th>Cotação</th><th>Pedido</th><th>Fornecedor</th><th>Produto / descrição</th><th>Qtd.</th><th>Valor</th><th>Status compra</th><th>Disciplina</th></tr></thead><tbody id="costDetailBody"></tbody></table></div></div>
         <div class="card" style="margin-top:16px"><div class="panel-title"><div><h3>Itens sem orçamento/custo vinculado</h3><p>Esses itens precisam de tratamento antes de apresentação financeira oficial.</p></div></div><div class="table-wrap"><table><thead><tr><th>Item</th><th>Atividade</th><th>Status</th><th>Responsável</th><th>Ação recomendada</th></tr></thead><tbody id="noCostBody"></tbody></table></div></div>
       </section>
 
@@ -1525,16 +1525,16 @@
     async function syncSeedCostsToServer(silent=false){
       const costs=getCompleteCostSeed();
       if(!costs.length){ showToast('Não encontrei a tabela de custos embutida.'); return; }
-      if(!silent && !confirm(`Vou gravar no Supabase a tabela completa de custos da planilha 25/05/26 com ${costs.length} linhas. Isso substitui somente a tabela de custos e não altera fotos nem posições do mapa. Continuar?`)) return;
+      if(!silent && !confirm(`Vou gravar no Supabase a tabela completa de custos da planilha 25/05/26. Isso substitui somente a tabela de custos e não altera fotos nem posições do mapa. Continuar?`)) return;
       try{
         updateMapSyncPill('Sincronizando custos...');
         const result=await apiPostAuthorized({action:'save_costs', costs});
         state.costs=costs;
         state.costsSource='Planilha 25/05/26 sincronizada no Supabase';
-        saveState(`Tabela completa de custos sincronizada: ${costs.length} linhas`);
+        saveState(`Tabela completa de custos sincronizada`);
         renderCosts();
         remoteOnline=true; updateMapSyncPill();
-        showToast(`Custos sincronizados: ${result.saved || costs.length} linhas gravadas no Supabase.`);
+        showToast(`Custos sincronizados no Supabase.`);
       }catch(err){
         updateMapSyncPill('Local');
         showToast(`Não consegui sincronizar custos no banco: ${escapeHtml(err.message)}`);
@@ -1579,7 +1579,7 @@
     function costStatusSummaryHtml(rows){
       const summary=costSummaryFromRows(rows);
       if(!summary.length) return '';
-      return `<div class="map-cost-status"><b>Status de compra</b>${summary.map(r=>`<div><span>${escapeHtml(r.status)} <em>${r.count} linha${r.count===1?'':'s'}</em></span><strong>${fmtMoney(r.value)}</strong></div>`).join('')}</div>`;
+      return `<div class="map-cost-status"><b>Status de compra</b>${summary.map(r=>`<div><span>${escapeHtml(r.status)}</span><strong>${fmtMoney(r.value)}</strong></div>`).join('')}</div>`;
     }
     function costRowsForItem(itemId){
       const target=normalizeLooseText(itemId);
@@ -1633,12 +1633,12 @@
       const orcNaoAprovado=statusValue(summary,'Orçamento não Aprovado');
       const noCost=state.items.filter(i=>!Number(i.cost)).length;
       const k=[
-        ['Total de custos',fmtMoney(total),`${costRows.length} linhas da tabela`],
-        ['Comprado',fmtMoney(comprado),`${statusCount(summary,'Comprado')} linhas`],
-        ['Em orçamento',fmtMoney(emOrcamento),`${statusCount(summary,'Em Orçamento')} linhas`],
-        ['Em processo',fmtMoney(emProcesso),`${statusCount(summary,'Em Processo de Compra')} linha(s)`],
-        ['Cancelado',fmtMoney(cancelado),`${statusCount(summary,'Cancelado')} linhas`],
-        ['Não aprovado',fmtMoney(orcNaoAprovado),`${statusCount(summary,'Orçamento não Aprovado')} linhas`],
+        ['Total de custos',fmtMoney(total),'Tabela detalhada'],
+        ['Comprado',fmtMoney(comprado),'Realizado / compra lançada'],
+        ['Em orçamento',fmtMoney(emOrcamento),'Cotações em análise'],
+        ['Em processo',fmtMoney(emProcesso),'Compra em andamento'],
+        ['Cancelado',fmtMoney(cancelado),'Não considerar no custo aprovado'],
+        ['Não aprovado',fmtMoney(orcNaoAprovado),'Orçamentos recusados'],
         ['Itens sem custo',noCost,'Sem orçamento vinculado'],
         ['Maior item',fmtMoney(Math.max(...state.items.map(i=>Number(i.cost)||0),0)),'Maior valor vinculado']
       ];
@@ -1647,7 +1647,7 @@
         console.warn('Custos usando fallback completo da planilha:', state.costsSource);
       }
       const max=Math.max(...summary.map(r=>r.value),1);
-      document.getElementById('costStatusBars').innerHTML=summary.map(r=>`<div class="bar-row"><b>${escapeHtml(r.status)}<span class="td-sub">${r.count} linha${r.count===1?'':'s'}</span></b><div class="bar"><i style="width:${(r.value/max)*100}%;background:${normalizeLooseText(r.status).includes('cancel')?'var(--red)':normalizeLooseText(r.status).includes('nao aprovado')?'var(--orange)':normalizeLooseText(r.status).includes('orcamento')?'var(--yellow)':normalizeLooseText(r.status).includes('processo')?'var(--purple)':'linear-gradient(90deg,var(--blue),var(--cyan))'}"></i></div><span>${fmtMoney(r.value)}</span></div>`).join('') || '<div class="empty">Nenhum custo importado.</div>';
+      document.getElementById('costStatusBars').innerHTML=summary.map(r=>`<div class="bar-row"><b>${escapeHtml(r.status)}</b><div class="bar"><i style="width:${(r.value/max)*100}%;background:${normalizeLooseText(r.status).includes('cancel')?'var(--red)':normalizeLooseText(r.status).includes('nao aprovado')?'var(--orange)':normalizeLooseText(r.status).includes('orcamento')?'var(--yellow)':normalizeLooseText(r.status).includes('processo')?'var(--purple)':'linear-gradient(90deg,var(--blue),var(--cyan))'}"></i></div><span>${fmtMoney(r.value)}</span></div>`).join('') || '<div class="empty">Nenhum custo importado.</div>';
       const topItems=state.items.slice().sort((a,b)=>(Number(b.cost)||0)-(Number(a.cost)||0)).slice(0,10); const imax=Math.max(...topItems.map(i=>Number(i.cost)||0),1);
       document.getElementById('itemCostBars').innerHTML=topItems.map(i=>`<div class="bar-row"><b>${i.id} · ${escapeHtml(i.area)}</b><div class="bar"><i style="width:${((Number(i.cost)||0)/imax)*100}%;background:${statusColor(i.status)}"></i></div><span>${fmtMoney(i.cost)}</span></div>`).join('');
       const rows=filteredCostRows().slice(0,600);
@@ -1734,8 +1734,124 @@
     }
     function openFirstCritical(){const i=state.items.find(x=>x.priority==='Crítica' || !Number(x.cost) || x.status==='AG. APROVAÇÃO') || state.items[0]; if(i){selectedId=i.id; goSection('map'); renderMap(); openModal(i.id)}}
     function openFirstNoPhoto(){const i=state.items.find(x=>!((state.photos||{})[x.id]||[]).length) || state.items[0]; if(i) openModal(i.id)}
+    function exportJsonBackup(){
+      const blob=new Blob([JSON.stringify(state,null,2)],{type:'application/json'});
+      const url=URL.createObjectURL(blob);
+      const a=document.createElement('a');
+      a.href=url;
+      a.download=`step-obras-backup-${new Date().toISOString().slice(0,10)}.json`;
+      a.click();
+      URL.revokeObjectURL(url);
+      showToast('Backup exportado em JSON.');
+    }
+    function excelDateBr(value){
+      if(!value) return '';
+      if(value instanceof Date && !isNaN(value)) return value.toLocaleDateString('pt-BR');
+      const s=String(value||'').trim();
+      if(!s) return '';
+      if(/^\d{4}-\d{2}-\d{2}/.test(s)){const [y,m,d]=s.slice(0,10).split('-'); return `${d}/${m}/${y}`;}
+      return s;
+    }
+    function numberToExcel(v){
+      const n=Number(v);
+      return Number.isFinite(n) ? n : 0;
+    }
+    function applyWorksheetBasics(ws, colWidths){
+      ws['!cols']=(colWidths||[]).map(w=>({wch:w}));
+      ws['!freeze']={xSplit:0,ySplit:1};
+      return ws;
+    }
+    function makeWorksheet(rows, colWidths){
+      const ws=XLSX.utils.aoa_to_sheet(rows);
+      return applyWorksheetBasics(ws, colWidths);
+    }
     function exportState(){
-      const blob=new Blob([JSON.stringify(state,null,2)],{type:'application/json'}); const url=URL.createObjectURL(blob); const a=document.createElement('a'); a.href=url; a.download=`step-obras-backup-${new Date().toISOString().slice(0,10)}.json`; a.click(); URL.revokeObjectURL(url); showToast('Backup exportado em JSON.');
+      exportExcelWorkbook();
+    }
+    function exportExcelWorkbook(){
+      if(!window.XLSX){ exportJsonBackup(); showToast('Biblioteca Excel não carregou. Exportei JSON como backup.'); return; }
+      const items=(state.items||[]).slice().sort((a,b)=>String(a.id).localeCompare(String(b.id),'pt-BR',{numeric:true}));
+      const costs=getCostRows().slice().sort((a,b)=>String(a.itemId||'').localeCompare(String(b.itemId||''),'pt-BR',{numeric:true}) || String(a.setor||'').localeCompare(String(b.setor||''),'pt-BR',{numeric:true}));
+      const wb=XLSX.utils.book_new();
+      wb.Props={Title:'Melhorias base STEP - Exportado do Painel',Subject:'Obras e Melhorias STEP',Author:'STEP Painel Online',CreatedDate:new Date()};
+
+      const statusRows=[['Status','Quantidade','Custo vinculado','Avanço médio','Fotos anexadas']];
+      statuses.forEach(st=>{
+        const list=items.filter(i=>i.status===st);
+        const qtd=list.length;
+        const custo=list.reduce((a,i)=>a+numberToExcel(i.cost),0);
+        const prog=qtd ? list.reduce((a,i)=>a+numberToExcel(i.progress),0)/qtd : 0;
+        const fotos=list.reduce((a,i)=>a+(((state.photos||{})[i.id]||[]).length),0);
+        statusRows.push([st,qtd,custo,prog/100,fotos]);
+      });
+      statusRows.push([]);
+      statusRows.push(['Total geral',items.length,items.reduce((a,i)=>a+numberToExcel(i.cost),0),items.length?items.reduce((a,i)=>a+numberToExcel(i.progress),0)/items.length/100:0,Object.values(state.photos||{}).reduce((a,p)=>a+(Array.isArray(p)?p.length:0),0)]);
+      const ws1=makeWorksheet(statusRows,[28,14,18,16,15]);
+      for(let r=1;r<=statusRows.length;r++){ const c=ws1[`C${r}`]; if(c&&typeof c.v==='number') c.z='R$ #,##0.00'; const d=ws1[`D${r}`]; if(d&&typeof d.v==='number') d.z='0%'; }
+      XLSX.utils.book_append_sheet(wb,ws1,'Planilha1');
+
+      const plannerHeaders=['ITEM PLANTA BAIXA','ATIVIDADE','STATUS','RESPONSÁVEL','PRIORIDADE','AVANÇO %','CUSTO VINCULADO','PRAZO','PRÓXIMA AÇÃO','OBSERVAÇÕES','POSIÇÃO X','POSIÇÃO Y','FOTOS ANEXADAS','LINK'];
+      const plannerRows=[plannerHeaders].concat(items.map(i=>[
+        i.id||'', i.title||'', i.status||'', i.owner||'', i.priority||'', numberToExcel(i.progress)/100, numberToExcel(i.cost), excelDateBr(i.due), i.next||'', i.notes||'', numberToExcel(i.x)/100, numberToExcel(i.y)/100, ((state.photos||{})[i.id]||[]).length, i.link||''
+      ]));
+      const wsPlanner=makeWorksheet(plannerRows,[18,46,22,22,14,12,18,14,44,46,12,12,14,34]);
+      for(let r=2;r<=plannerRows.length;r++){ ['F','K','L'].forEach(col=>{const cell=wsPlanner[`${col}${r}`]; if(cell&&typeof cell.v==='number') cell.z='0%';}); const cost=wsPlanner[`G${r}`]; if(cost&&typeof cost.v==='number') cost.z='R$ #,##0.00'; }
+      XLSX.utils.book_append_sheet(wb,wsPlanner,'Planejador de Projetos');
+
+      const compradoTotal=statusValue(costSummaryFromRows(costs),'Comprado');
+      const orcamentoTotal=statusValue(costSummaryFromRows(costs),'Em Orçamento');
+      const custosRows=[];
+      custosRows.push(['','','','','','','','Comprado',compradoTotal,'','Setor','',items.reduce((a,i)=>a+numberToExcel(i.cost),0)]);
+      custosRows.push(['','','','','','','','Total Orçado',orcamentoTotal,'','','','']);
+      custosRows.push([]);
+      custosRows.push(['SETOR','COTAÇÃO','DT COTAÇÃO','PEDIDO','DT PEDIDO','FORNECEDOR','PRODUTO','QT PEDIDA','VALOR','ORIGEM','STATUS DA COMPRA','DISCIPLINA','ITEM PLANTA','OBSERVAÇÃO']);
+      costs.forEach(r=>custosRows.push([
+        r.setor||'', r.cotacao||'', excelDateBr(r.dataCotacao||r.data_cotacao), r.pedido||'', excelDateBr(r.dataPedido||r.data_pedido), r.fornecedor||'', r.produto||'', numberToExcel(r.quantidade), numberToExcel(r.valor), r.origem||'', normalizeStatusCompra(r.statusCompra||r.status_compra||'Não informado'), r.disciplina||'', r.itemId||'', r.observacao||''
+      ]));
+      const wsCustos=makeWorksheet(custosRows,[26,13,14,13,14,42,60,12,16,14,24,18,14,36]);
+      [1,2].forEach(r=>{ const cell=wsCustos[`I${r}`]; if(cell&&typeof cell.v==='number') cell.z='R$ #,##0.00'; const total=wsCustos[`M${r}`]; if(total&&typeof total.v==='number') total.z='R$ #,##0.00'; });
+      for(let r=5;r<=custosRows.length;r++){ const q=wsCustos[`H${r}`]; if(q&&typeof q.v==='number') q.z='#,##0.00'; const v=wsCustos[`I${r}`]; if(v&&typeof v.v==='number') v.z='R$ #,##0.00'; }
+      XLSX.utils.book_append_sheet(wb,wsCustos,'Custos x Execução');
+
+      const statusList=['Comprado','Em Orçamento','Em Processo de Compra','Gerar Pedido','Cancelado','Orçamento não Aprovado','Não informado'];
+      const setorMap={};
+      costs.forEach(r=>{
+        const setor=r.setor || 'Sem setor';
+        const st=normalizeStatusCompra(r.statusCompra||r.status_compra||'Não informado');
+        if(!setorMap[setor]) setorMap[setor]={setor, linhas:0};
+        setorMap[setor].linhas += 1;
+        setorMap[setor][st]=(setorMap[setor][st]||0)+numberToExcel(r.valor);
+      });
+      const pivotHeaders=['Setor'].concat(statusList).concat(['Total Geral','Linhas']);
+      const pivotRows=[pivotHeaders];
+      Object.values(setorMap).sort((a,b)=>{
+        const ta=statusList.reduce((s,k)=>s+(a[k]||0),0); const tb=statusList.reduce((s,k)=>s+(b[k]||0),0); return tb-ta;
+      }).forEach(r=>{
+        const vals=statusList.map(k=>r[k]||0);
+        pivotRows.push([r.setor].concat(vals).concat([vals.reduce((a,b)=>a+b,0),r.linhas]));
+      });
+      const totalRow=['Total Geral'];
+      statusList.forEach((k,idx)=>{ totalRow.push(pivotRows.slice(1).reduce((a,row)=>a+numberToExcel(row[idx+1]),0)); });
+      totalRow.push(pivotRows.slice(1).reduce((a,row)=>a+numberToExcel(row[statusList.length+1]),0));
+      totalRow.push(pivotRows.slice(1).reduce((a,row)=>a+numberToExcel(row[statusList.length+2]),0));
+      pivotRows.push(totalRow);
+      const wsPivot=makeWorksheet(pivotRows,[34,18,18,22,16,18,24,18,18,12]);
+      for(let r=2;r<=pivotRows.length;r++){ for(let c=1;c<=statusList.length+1;c++){ const addr=XLSX.utils.encode_cell({r:r-1,c}); const cell=wsPivot[addr]; if(cell&&typeof cell.v==='number') cell.z='R$ #,##0.00'; } }
+      XLSX.utils.book_append_sheet(wb,wsPivot,'Dinamic. Custo Setor');
+
+      const evidenceRows=[['ITEM','OBRA','NOME DO ARQUIVO','DATA/HORA','TIPO','TAMANHO / INFO']];
+      Object.entries(state.photos||{}).forEach(([id,photos])=>{
+        const item=getItem(id)||{};
+        (photos||[]).forEach(p=>evidenceRows.push([id,item.title||'',p.name||'',p.ts?new Date(p.ts).toLocaleString('pt-BR'):'',p.type||'',p.url||p.path||'Imagem salva no painel']));
+      });
+      XLSX.utils.book_append_sheet(wb,makeWorksheet(evidenceRows,[14,42,48,22,16,44]),'Evidências');
+
+      const histRows=[['DATA/HORA','AÇÃO']].concat((state.history||[]).map(h=>[h.ts?new Date(h.ts).toLocaleString('pt-BR'):'',h.text||h.action||'']));
+      XLSX.utils.book_append_sheet(wb,makeWorksheet(histRows,[22,90]),'Histórico');
+
+      const fileName=`Melhorias base STEP exportado painel ${new Date().toISOString().slice(0,10)}.xlsx`;
+      XLSX.writeFile(wb,fileName,{compression:true});
+      showToast('Planilha exportada em Excel com abas separadas.');
     }
     importFile.addEventListener('change', async e=>{
       const file=e.target.files[0]; if(!file) return;

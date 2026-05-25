@@ -1,0 +1,10 @@
+STEP Painel de Obras - V25
+
+Correção visual:
+- Oculta as contagens de linhas nos cards e blocos de status de compra.
+- Mantém os valores separados por status: Comprado, Em Orçamento, Em Processo, Cancelado e Não Aprovado.
+- Não altera banco, fotos, mapa ou custos.
+
+Para publicar:
+1. Execute PUBLICAR_V25_OCULTA_LINHAS.cmd
+2. No Netlify, faça Clear cache and deploy site.
