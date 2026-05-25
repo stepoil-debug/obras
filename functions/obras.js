@@ -168,9 +168,16 @@ exports.handler = async (event) => {
 
       if(photoError) throw photoError;
 
-      const costs = await tableExistsOrIgnore(
-        db.from('step_obras_costs').select('*').order('item_id', { ascending:true }).order('id', { ascending:true })
-      );
+      let costs = [];
+      let costsWarning = null;
+      try{
+        costs = await tableExistsOrIgnore(
+          db.from('step_obras_costs').select('*').order('item_id', { ascending:true }).order('id', { ascending:true })
+        );
+      }catch(costErr){
+        costsWarning = costErr.message || 'Não foi possível carregar a tabela de custos.';
+        costs = [];
+      }
 
       const bucket = process.env.SUPABASE_BUCKET || 'step-obras-evidencias';
       const photosWithUrls = (photos || []).map((p) => {
@@ -187,7 +194,7 @@ exports.handler = async (event) => {
         return !acc || (t && t > acc) ? t : acc;
       }, null);
 
-      return response(200, { ok:true, items: items || [], photos: photosWithUrls, costs, updatedAt });
+      return response(200, { ok:true, items: items || [], photos: photosWithUrls, costs, costsWarning, updatedAt });
     }
 
     if(event.httpMethod !== 'POST') return response(405, { ok:false, error:'Método não permitido.' });
