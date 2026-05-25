@@ -73,6 +73,18 @@ function cleanItem(item = {}){
   };
 }
 
+function normalizeStatusCompra(status){
+  const raw = String(status || 'Não informado').replace('Apravado','Aprovado').trim() || 'Não informado';
+  const n = raw.normalize('NFD').replace(/[\u0300-\u036f]/g,'').toLowerCase();
+  if(n === 'comprado') return 'Comprado';
+  if(n.includes('processo')) return 'Em Processo de Compra';
+  if(n.includes('gerar pedido')) return 'Gerar Pedido';
+  if(n.includes('em orcamento')) return 'Em Orçamento';
+  if(n.includes('nao aprovado')) return 'Orçamento não Aprovado';
+  if(n.includes('cancel')) return 'Cancelado';
+  return raw;
+}
+
 function cleanCost(row = {}, idx = 0){
   const itemId = String(row.item_id || row.itemId || '').trim() || null;
   const setor = row.setor || null;
@@ -92,7 +104,7 @@ function cleanCost(row = {}, idx = 0){
     quantidade: Number(row.quantidade ?? row.qtd ?? 0) || 0,
     valor,
     origem: row.origem || null,
-    status_compra: row.status_compra || row.statusCompra || 'Não informado',
+    status_compra: normalizeStatusCompra(row.status_compra || row.statusCompra || 'Não informado'),
     disciplina: row.disciplina || null,
     observacao: row.observacao || null,
     source: row.source || 'painel',
@@ -172,7 +184,7 @@ exports.handler = async (event) => {
       let costsWarning = null;
       try{
         costs = await tableExistsOrIgnore(
-          db.from('step_obras_costs').select('*').order('item_id', { ascending:true }).order('id', { ascending:true })
+          db.from('step_obras_costs').select('*').order('item_id', { ascending:true }).order('id', { ascending:true }).limit(5000)
         );
       }catch(costErr){
         costsWarning = costErr.message || 'Não foi possível carregar a tabela de custos.';

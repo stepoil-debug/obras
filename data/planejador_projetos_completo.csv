@@ -1,0 +1,82 @@
+﻿ordem,id,area,title,status,progress,owner,priority,cost,custo_comprado,due,next,notes,x,y,metadata
+1,01A,Abastecimento / descarte,Realocar o posto de abastecimento de diesel.,DEMANDA CONCLUIDA,100,DEMANDA CONCLUIDA,Alta,19635.84,19635.84,2026-03-30,DEMANDA CONCLUIDA,"02/02/2026: É preciso realocar para o novo local já demarcado para iniciar a demanda 02 por conta de espaço.
+06/02/2026: Material complementar previsto para suprimento total na data de hoje 06/02.
+09/02/2026: Todo o material foi suprido, aguardando as condições climáticas melhorarem para dar continuidade.
+26/02/2026: Parte civil finalizada, aguardando condições climaticas melhorarem para realizar a movimentação do posto atual para o novo local e realizar a ligação da estação de abastecimento.",21,80,"{""source"": ""Melhorias base STEP 25-05-26.xlsx"", ""source_sheet"": ""Planejador de Projetos"", ""source_row"": 5, ""raw_priority"": ""3"", ""raw_status"": ""DEMANDA CONCLUIDA""}"
+2,01,Matéria-prima,Área de armazenagem de matéria prima.,AG. MATERIAL,0,VIRGILIO,Baixa,107186.95,97026.95,2026-04-15,"1- Locação de bitoneira e caminhão munk.
+Cotação: 40680 e 28002.","02/02/2026: Material cotado, aguardando recebimento, precisa ser realizado a movimentação do posto de abastecimento e recurso para iniciar a demanda, se faz necessario um pedido complementar de material.",17.5,58,"{""source"": ""Melhorias base STEP 25-05-26.xlsx"", ""source_sheet"": ""Planejador de Projetos"", ""source_row"": 6, ""raw_priority"": ""5"", ""raw_status"": ""AG. MATERIAL""}"
+3,02,Corte / Usinagem,Central de corte | Usinagem,EM ANDAMENTO,0,"SORIN
+ HUGO
+VALTER
+ALESSANDER",Média,218253.36,208203.36,2026-05-10,"Está sendo realizado o encaminhamento e montagem das eletrocalhas para posteiormente realizar a passagem dos cabos e a ligação dos equipamentos.
+Verificar com Sorin a necessidade de instalação de um ponto de ar comprimido para utlização da plasma.","02/02/2026: Material suprido, aguardando definição da nova instalação e recurso para iniciar a demanda.
+05/02/2026: Cotação da tapagem aprovada.
+12/02/2026: Verificar com Hugo e Sorin sobre a instalação de painéis 380 v.
+26/02/2026: Área já toda coberta, layout definido, aguardando compra de cabos para instalação dos paineis e aguardando a chegada da maquina de corte plasma.",52,33,"{""source"": ""Melhorias base STEP 25-05-26.xlsx"", ""source_sheet"": ""Planejador de Projetos"", ""source_row"": 7, ""raw_priority"": ""4"", ""raw_status"": ""EM ANDAMENTO""}"
+4,03,Fabricação,Novo galpão de fabricação.,EM ANDAMENTO,40,"SORIN
+VALTER
+HUGO",Alta,1104838.33,424519.35,2026-05-25,"1- Falta verificar parte elétrica: Cabeamento, luminárias e painéis.","02/02/2026: Material para a fabricação do galpão suprido, montagem em andamento.
+06/02/2026: Layout da fabrica em elaboração com a Karina, com previsão de ser apresentado para aprovação hoje 06/02.
+Após a aprovação, Hugo realizara o levantamento dos materiais de eletrica.
+12/02/2026: Layout precisa se revisado com alguns novos ajustes para possibilitar o levantamento de material elétrico
+26/02/2026: Área liberada para utilização, falta emitir o pedido de luminarias para possibilitar o trabalho noturno mais eficiente.",55,43,"{""source"": ""Melhorias base STEP 25-05-26.xlsx"", ""source_sheet"": ""Planejador de Projetos"", ""source_row"": 8, ""raw_priority"": ""2"", ""raw_status"": ""EM ANDAMENTO""}"
+5,04,Galpão 01,Nova ponte rolante no galpão 04.,AG. COTAÇÃO,0,SORIN,Crítica,16637935.87,232493.91,2026-06-10,Aguardando atualização da proposta do equipamento para emitir a OC.,"02/02/2026: Avaliar com a liderança da produção e da base, a melhor opção de custo x beneficio e reeniciar estudo da infraestrutura.
+12/02/2026: Aguardando atualizar a cotação para emitir a OC.",61.5,58,"{""source"": ""Melhorias base STEP 25-05-26.xlsx"", ""source_sheet"": ""Planejador de Projetos"", ""source_row"": 9, ""raw_priority"": ""1"", ""raw_status"": ""AG. COTAÇÃO""}"
+6,05,TH,Galpão do TH - Movimentação pórtico ou monorail.,AG. APROVAÇÃO,0,"SORIN
+MARCUS
+ALESSANDER
+RICARDO",Alta,0.0,0.0,2026-04-30,Aguardando aprovação do pedido do pórtico.,"02/02/2026: Avaliar com a liderança do TH e da base, a melhor opção de custo x beneficio e iniciar estudo da infraestrutura.
+Construir um ""bunker"" para segurança dos operadores.
+12/02/2026: EMITIR OC DO PÓRTICO",35.3,42.7,"{""source"": ""Melhorias base STEP 25-05-26.xlsx"", ""source_sheet"": ""Planejador de Projetos"", ""source_row"": 10, ""raw_priority"": null, ""raw_status"": ""AG. APROVAÇÃO""}"
+7,06,Jato,Ampliação da cabine de jato.,AG. APROVAÇÃO,0,"PAULO DAVI
+ALESSANDER
+RICARDO",Alta,3352524.79,321000.24,2026-05-20,"1- Recurso externo, procurar fornecedores/propostas para execução.
+2- Material necessario ja identificado, com proposta, aguardando definição se seguiremos ou não.
+3- Incluir um troller para a cabine de jato.","02/02/2026: Iniciar estudo de ampliação da cabine de jato, instalação da rosca infinita para abastecimento dos cilos de granalha e reposicionamento dos equipamentos
+26/02/2026: Pedido de material para ampliação da cabine realizado, falta definir qual processo adotar para o recolhimento da granalha pós jato.",42,46,"{""source"": ""Melhorias base STEP 25-05-26.xlsx"", ""source_sheet"": ""Planejador de Projetos"", ""source_row"": 11, ""raw_priority"": null, ""raw_status"": ""AG. APROVAÇÃO""}"
+8,06A,Pintura / Risco,Galpão de pintura menor.,DEMANDA CONCLUIDA,100,DEMANDA CONCLUIDA,Média,1800.0,1800.0,2026-03-28,DEMANDA CONCLUIDA,"02/02/2026: Fechamento dos portões, melhoria na iluminação e exaustão para a cabine provisória.",48.5,62.5,"{""source"": ""Melhorias base STEP 25-05-26.xlsx"", ""source_sheet"": ""Planejador de Projetos"", ""source_row"": 12, ""raw_priority"": ""Conc."", ""raw_status"": ""DEMANDA CONCLUIDA""}"
+9,07,Pintura,Galpão de pintura principal.,AG. APROVAÇÃO,0,"SORIN
+MARCUS
+ALESSANDER
+RICARDO",Alta,13915.66,0.0,2026-05-05,Aguardando aprovação do pedido do pórtico.,"02/02/2026: Instalação de monorail, cortinas de pintura e iluminação.
+12/02/2026: EMITIR OC DO PÓRTICO",39.4,57.3,"{""source"": ""Melhorias base STEP 25-05-26.xlsx"", ""source_sheet"": ""Planejador de Projetos"", ""source_row"": 13, ""raw_priority"": null, ""raw_status"": ""AG. APROVAÇÃO""}"
+10,07A,Pintura / Paletização,Construção de um novo galpão de pintura ao lado do galpão de pintura já existente e área de paletização.,AG. PROJETO,0,"SORIN
+ PAULO DAVI
+GABRIEL BARTZ",Média,338841.35,63858.93,2026-06-15,"1- Aguardando apovação de propostas externas para execução
+2- Aguardando projeto para levantamento de material
+3-Subcontratação de cálculo estrutural (galpão) Sordi","02/02/2026: Iniciar estudo de área disponivel por conta do fluxo de movimentações, redimensionar exaustores e linhas de incêndio",42,65.6,"{""source"": ""Melhorias base STEP 25-05-26.xlsx"", ""source_sheet"": ""Planejador de Projetos"", ""source_row"": 14, ""raw_priority"": null, ""raw_status"": ""AG. PROJETO""}"
+11,07B,Componentes jato/pintura,Nova área para os Equipamento/componentes da cabine de jato e pintura,EM ANDAMENTO,0,Gabriel Bartz,Média,12160.4,12160.4,2026-05-05,1- Layout aprovado no dia 03/02. A ser realizado o detalhamento de execução. Detalhamento a ser apresentado até 20/02,"02/02/2026: Área selecionada para realocação dos equipamentos/componentes das cabines de jateamento e pintura.
+Fazer nova revisão da planta baixa junto a prefeitura, pois essa área é considerada como ""área verde"". (Projeto Legal)
+26/02/2026: Nova área já foi limpa, e escavada, aguardando a chegada dos materiais para dar continuidade na parte civil com posterior montagem dos dutos e movimentação dos componentes do equipamento.",25,42.5,"{""source"": ""Melhorias base STEP 25-05-26.xlsx"", ""source_sheet"": ""Planejador de Projetos"", ""source_row"": 15, ""raw_priority"": null, ""raw_status"": ""EM ANDAMENTO""}"
+12,07C,Laboratório Pull-Off,Laboratório de inspeção de pintura (Pull-Off),AG. APROVAÇÃO,0,"PAULO DAVI
+MARCUS
+ALESSANDER
+RICARDO",Alta,509271.55,0.0,2026-05-30,"1- Cotação realizada, aguardando a aprovação do pedido.","02/02/2026: Após a movimentação de todos os equipamentos/componentes da cabine de jato e pintura, mobilizar um laboratório de inspeção de pintura
+12/02/2026: Espaço já demarcado para o laboratório de inspeção de pintura, aguardando aprovação do pedido.",33.8,58.7,"{""source"": ""Melhorias base STEP 25-05-26.xlsx"", ""source_sheet"": ""Planejador de Projetos"", ""source_row"": 16, ""raw_priority"": null, ""raw_status"": ""AG. APROVAÇÃO""}"
+13,08,Materiais nobres,Galpão de ligas especiais,AG. COTAÇÃO,0,SORIN,Alta,0.0,0.0,2026-05-18,"1- Pendente análise sobre o pórtico ou monorail.
+2- Após a definição, deverá ser realizado a pintura em epoxi com as devidas marcações.",02/02/2026: Verificar o melhor custo x beneficio para implementação de um pórtico ou monorail para movimentações e a melhoria de uma área de segragação de material.,27.7,48.3,"{""source"": ""Melhorias base STEP 25-05-26.xlsx"", ""source_sheet"": ""Planejador de Projetos"", ""source_row"": 17, ""raw_priority"": null, ""raw_status"": ""AG. COTAÇÃO""}"
+14,09,SMS / Treinamento,Construir o escritório para o pessoal do SMS | Treinamento.,AG. APROVAÇÃO,0,"VALTER
+MARCUS
+ALESSANDER
+RICARDO",Média,687522.0,0.0,2026-05-22,"1- Já temos alguns orçamentos, seguem aguardando aprovação.
+2- Necessario recurso externo para a fabricação das tesouras.","02/02/2026: Realizar orçamentos para construção do escritório.
+12/02/2026: Verificar recurso financeiro para execução.",75.5,74,"{""source"": ""Melhorias base STEP 25-05-26.xlsx"", ""source_sheet"": ""Planejador de Projetos"", ""source_row"": 18, ""raw_priority"": null, ""raw_status"": ""AG. APROVAÇÃO""}"
+15,10,Refeitório / Escritório,Ampliação do refeitório,DEMANDA CONCLUIDA,100,DEMANDA CONCLUIDA,Média,0.0,0.0,2026-03-25,DEMANDA CONCLUIDA,02/02/2026: Ampliar o refeitório para acomodar o crescimento do efetivo da base.,84,52.5,"{""source"": ""Melhorias base STEP 25-05-26.xlsx"", ""source_sheet"": ""Planejador de Projetos"", ""source_row"": 19, ""raw_priority"": ""Conc."", ""raw_status"": ""DEMANDA CONCLUIDA""}"
+16,11,Logística,Novo escritório da logística,AG. COTAÇÃO,0,VIRGILIO,Média,0.0,0.0,2026-05-12,1- Realizar orçamento de material,02/02/2026: Realocar o escritório da logística proximo ao setor 01 para possibilitar um fluxo de processos com as etapas posteriores.,71.5,80.5,"{""source"": ""Melhorias base STEP 25-05-26.xlsx"", ""source_sheet"": ""Planejador de Projetos"", ""source_row"": 20, ""raw_priority"": null, ""raw_status"": ""AG. COTAÇÃO""}"
+17,12,Expedição,Tapagem da área de expedição,AG. COTAÇÃO,0,"VIRGILIO
+VALTER",Alta,0.0,0.0,2026-05-12,"1- Área de tapagem foi ampliada, verificar se o orçamento feito contempla esse novo espaço.",02/02/2026: Orçamento da cobertura já realizado.,20.2,80,"{""source"": ""Melhorias base STEP 25-05-26.xlsx"", ""source_sheet"": ""Planejador de Projetos"", ""source_row"": 21, ""raw_priority"": null, ""raw_status"": ""AG. COTAÇÃO""}"
+18,13,Almoxarifado / Recebimento,Ampliação do almoxarifado / mezanino,AG. PROJETO,0,"VIRGILIO
+GABRIEL BARTZ",Média,27500.0,0.0,2026-06-20,2- Aguardando projeto para levantamento de material 3-Subcontratação de cálculo estrutural (galpão) Sordi,02/02/2026: Proposta de execução externa já realizada,78,40,"{""source"": ""Melhorias base STEP 25-05-26.xlsx"", ""source_sheet"": ""Planejador de Projetos"", ""source_row"": 22, ""raw_priority"": null, ""raw_status"": ""AG. PROJETO""}"
+19,16,Mecânica / Manutenção,Layout da mecânica/manutenção,AG. PROJETO,0,"VIRGILIO
+GABRIEL BARTZ",Baixa,1320.0,1320.0,2026-06-30,1- Verificar projeto.,03/02/2026: Verificar projeto.,71.8,31.5,"{""source"": ""Melhorias base STEP 25-05-26.xlsx"", ""source_sheet"": ""Planejador de Projetos"", ""source_row"": 23, ""raw_priority"": null, ""raw_status"": ""AG. PROJETO""}"
+20,15,Suprimento,Prateleiras e paleteira elétrica | SUPRIMENTO,AG. APROVAÇÃO,0,"VIRGILIO
+MARCUS
+HERMANN
+ALESSANDER
+RICARDO",Média,33891.56,21891.56,2026-04-28,"Aguardando aprovação do pedido da prateleira, paleteira e fechaduras.","03/02/2026: Já existe a cotação do material necessario.
+12/02/2026: EMITIR OC.",76.8,58.5,"{""source"": ""Melhorias base STEP 25-05-26.xlsx"", ""source_sheet"": ""Planejador de Projetos"", ""source_row"": 24, ""raw_priority"": null, ""raw_status"": ""AG. APROVAÇÃO""}"
+21,14,Vestiário,Ampliação do vestiario feminino/masculino.,EM ANDAMENTO,0,"VALTER
+MARCUS
+ALESSANDER
+RICARDO",Média,59207.6,59207.6,2026-05-18,"Tesouras sendo fabricadas, aguardando aprovação do pedido de material para realizar a montagem.","09/02/2026: Está sendo realizado o estudo de ampliação do vestiario feminino e masculino.
+26/02/2026: Execução em andamento, empresa FORTENGENHARIA realizando a montagem das tesouras dentro da base STEP, aguardando aprovação do pedido de compra para o restante do material para iniciar a ampliação.",70.2,44,"{""source"": ""Melhorias base STEP 25-05-26.xlsx"", ""source_sheet"": ""Planejador de Projetos"", ""source_row"": 25, ""raw_priority"": null, ""raw_status"": ""EM ANDAMENTO""}"
