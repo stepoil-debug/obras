@@ -1,0 +1,26 @@
+STEP | Painel Obras e Melhorias - v19 CUSTOS COMPLETOS
+
+Esta versão corrige a leitura dos custos usando a aba completa "Custos x Execução" do arquivo:
+Melhorias base STEP 25-05-26.xlsx
+
+Correções principais:
+- Tabela de custos agora deve usar step_obras_costs no Supabase.
+- SQL v19 carrega 311 linhas de custo detalhado.
+- Comprado, Cancelado, Não aprovado e Em orçamento passam a ser calculados pela tabela completa.
+- Mantém posições do mapa e fotos já anexadas.
+- Continua com mapa, pop-up por duplo clique, mobile e importação Excel/JSON.
+
+COMO PUBLICAR O SITE:
+1) Extraia este ZIP.
+2) Rode PUBLICAR_V19_CORRIGIDO.cmd.
+3) No Netlify, rode Clear cache and deploy site.
+
+COMO CORRIGIR O BANCO:
+1) Abra o Supabase > SQL Editor.
+2) Rode o arquivo: supabase/RODAR_ESTE_SQL_V19_CUSTOS_COMPLETOS.sql
+3) No painel, clique em Recarregar banco ou use Ctrl + F5.
+
+Importante:
+- O SQL não apaga fotos.
+- O SQL não altera posições X/Y do mapa.
+- O SQL apaga e recarrega somente a tabela step_obras_costs.

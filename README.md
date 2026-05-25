@@ -30,3 +30,15 @@ A rota usada pelo frontend é:
 ```
 
 A versão v16 remove as referências visuais à plataforma de hospedagem e mantém o painel com identidade STEP.
+
+---
+
+## Atualização v19 - Custos completos
+
+Esta versão inclui a correção da tabela de custos a partir da planilha completa `Melhorias base STEP 25-05-26.xlsx`.
+
+Após publicar o site, rode no Supabase:
+
+`supabase/RODAR_ESTE_SQL_V19_CUSTOS_COMPLETOS.sql`
+
+Depois recarregue o painel.
