@@ -125,6 +125,10 @@
     .field{background:rgba(255,255,255,.055);border:1px solid var(--line);border-radius:14px;color:var(--text);padding:10px 12px;outline:none;min-height:42px}
     .field::placeholder{color:#7890a8}
     select.field{appearance:none;background-image:linear-gradient(45deg,transparent 50%,var(--muted) 50%),linear-gradient(135deg,var(--muted) 50%,transparent 50%);background-position:calc(100% - 18px) 18px,calc(100% - 12px) 18px;background-size:6px 6px,6px 6px;background-repeat:no-repeat;padding-right:34px}
+    select.field option{background:#0f2238;color:#edf5ff;}
+    select.field optgroup{background:#0f2238;color:#edf5ff;}
+    select.field:focus{border-color:rgba(59,163,255,.55);box-shadow:0 0 0 3px rgba(59,163,255,.14);}
+    @supports (-webkit-touch-callout: none){select.field option{background:#fff;color:#102842;}}
     textarea.field{min-height:92px;resize:vertical;width:100%}
     .table-wrap{overflow:auto;border:1px solid var(--line);border-radius:18px;background:rgba(255,255,255,.025)}
     table{width:100%;border-collapse:collapse;min-width:980px}
@@ -254,7 +258,7 @@
       <div class="topbar">
         <div class="title">
           <h2 id="pageTitle">Painel Executivo de Obras e Melhorias</h2>
-          <p>Controle visual da carteira de melhorias da base STEP, com status das obras, avanço físico, custos, pendências e evidências fotográficas por item da planta. Versão v25 - Painel Online STEP + Supabase, exportação Excel com abas iguais à planilha base.</p>
+          <p>Controle visual da carteira de melhorias da base STEP, com status das obras, avanço físico, custos, pendências e evidências fotográficas por item da planta. Versão v26 - Painel Online STEP + Supabase, exportação Excel com abas iguais à planilha base.</p>
         <div class="mobile-tip">No telefone: abra a obra, toque em <b>Atualizar obra</b> e use <b>Incluir imagens</b> para tirar foto ou anexar da galeria. A importação agora aceita Excel, CSV e JSON.</div></div>
         <div class="actions">
           <button class="btn" onclick="print()">🖨️ Imprimir</button>
@@ -1252,8 +1256,7 @@
           <div style="margin:16px 0"><div class="mini-progress"><div class="progress-track"><div class="progress-fill" style="width:${Number(item.progress)||0}%;background:${statusColor(item.status)}"></div></div><b>${fmtPct(item.progress)}</b></div></div>
           <div class="detail-list">
             <div><span>Custo</span><b>${Number(item.cost)?fmtMoney(item.cost):'Sem orçamento'}</b></div>
-            <div><span>Linhas de custo</span><b>${itemCostRows.length}</b></div>
-            <div><span>Total na tabela</span><b>${itemCostRows.length ? fmtMoney(itemCostTotal) : 'Sem lançamento'}</b></div>
+            <div><span>Total na tabela de custo</span><b>${itemCostRows.length ? fmtMoney(itemCostTotal) : 'Sem lançamento'}</b></div>
             <div><span>Prioridade</span><b>${escapeHtml(item.priority)}</b></div>
             <div><span>Prazo</span><b>${shortDate(item.due)}</b></div>
             <div><span>Responsável</span><b>${escapeHtml(item.owner||'A definir')}</b></div>
@@ -1343,8 +1346,7 @@
         <div style="margin:16px 0"><div class="mini-progress"><div class="progress-track"><div class="progress-fill" style="width:${i.progress}%;background:${statusColor(i.status)}"></div></div><b>${fmtPct(i.progress)}</b></div></div>
         <div class="detail-list">
           <div><span>Custo</span><b>${Number(i.cost)?fmtMoney(i.cost):'Sem orçamento'}</b></div>
-          <div><span>Linhas de custo</span><b>${itemCostRows.length}</b></div>
-          <div><span>Total na tabela</span><b>${itemCostRows.length ? fmtMoney(itemCostTotal) : 'Sem lançamento'}</b></div>
+          <div><span>Total na tabela de custo</span><b>${itemCostRows.length ? fmtMoney(itemCostTotal) : 'Sem lançamento'}</b></div>
           <div><span>Prioridade</span><b>${escapeHtml(i.priority)}</b></div>
           <div><span>Prazo</span><b>${shortDate(i.due)}</b></div>
           <div><span>Fotos</span><b>${photos.length}</b></div>

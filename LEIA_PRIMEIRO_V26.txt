@@ -1,0 +1,10 @@
+STEP Painel de Obras - v26
+
+Correção visual:
+- Corrigida a cor das letras nos menus de seleção/filtros.
+- Os filtros de Status/Prioridade agora ficam legíveis no desktop e celular.
+- Mantém todas as funções anteriores: mapa completo, custos, exportação Excel em abas e Supabase.
+
+Publicação:
+1. Execute PUBLICAR_V26_CORRIGE_SELECT.cmd
+2. No Netlify, faça Clear cache and deploy site se necessário.
