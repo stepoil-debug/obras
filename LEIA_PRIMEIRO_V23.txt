@@ -1,0 +1,13 @@
+VERSÃO V23 - MAPA COMPLETO CORRIGIDO
+
+O problema do mapa cortado era a imagem da planta dentro do HTML que estava truncada/corrompida.
+Agora a planta completa fica no arquivo:
+assets/planta-baixa-step-completa.jpg
+
+COMO PUBLICAR:
+1. Extraia este ZIP.
+2. Execute PUBLICAR_V23_MAPA_COMPLETO.cmd.
+3. No Netlify, faça Clear cache and deploy site.
+4. No painel, abra Mapa da Planta e clique em Ajustar tela.
+
+Essa versão não altera banco, fotos, custos nem posições salvas no Supabase.
