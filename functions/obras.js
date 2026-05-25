@@ -18,13 +18,7 @@ function requiredEnv(name){
 }
 
 function getSupabaseKey(){
-  // Para gravação, use a chave secreta/service_role no ambiente do site.
-  // Aceita estes nomes para evitar erro de configuração.
-  const candidates = [
-    'SUPABASE_SERVICE_ROLE_KEY',
-    'SUPABASE_SECRET_KEY',
-    'SUPABASE_SERVICE_KEY'
-  ];
+  const candidates = ['SUPABASE_SERVICE_ROLE_KEY','SUPABASE_SECRET_KEY','SUPABASE_SERVICE_KEY'];
   for(const name of candidates){
     const value = (process.env[name] || '').trim();
     if(value) return { name, value };
@@ -35,18 +29,16 @@ function getSupabaseKey(){
 function supabase(){
   const url = requiredEnv('SUPABASE_URL');
   const { name, value } = getSupabaseKey();
-
-  // Erros comuns: colar publishable/anon no lugar da service_role, colar a chave quebrada, ou inserir aspas/espaços.
   if(value.includes(' ') || value.includes('\n') || value.includes('\r')){
     throw new Error(`${name} contém espaços/quebras de linha. Cole a chave em uma única linha nas variáveis do site.`);
   }
   if(value.startsWith('sb_publishable_')){
     throw new Error(`${name} recebeu uma publishable key. Para salvar no banco, use a service_role/secret key nas variáveis do site.`);
   }
-
-  return createClient(url, value, {
-    auth: { persistSession: false }
-  });
+  if(value.startsWith('COLE_AQUI')){
+    throw new Error(`${name} ainda está com texto placeholder. Cole a service_role/secret key real do Supabase.`);
+  }
+  return createClient(url, value, { auth: { persistSession: false } });
 }
 
 function describeSupabaseEnv(){
@@ -61,7 +53,6 @@ function describeSupabaseEnv(){
     }))
   };
 }
-
 
 function cleanItem(item = {}){
   return {
@@ -82,10 +73,70 @@ function cleanItem(item = {}){
   };
 }
 
+function cleanCost(row = {}, idx = 0){
+  const itemId = String(row.item_id || row.itemId || '').trim() || null;
+  const setor = row.setor || null;
+  const produto = row.produto || row.descricao || null;
+  const valor = Number(row.valor ?? row.value ?? 0) || 0;
+  const rowKey = String(row.row_key || row.rowKey || `${itemId || 'sem-item'}-${idx}-${setor || ''}-${produto || ''}-${valor}`).slice(0,250);
+  return {
+    row_key: rowKey,
+    item_id: itemId,
+    setor,
+    cotacao: row.cotacao ? String(row.cotacao) : null,
+    data_cotacao: row.data_cotacao || row.dataCotacao || null,
+    pedido: row.pedido ? String(row.pedido) : null,
+    data_pedido: row.data_pedido || row.dataPedido || null,
+    fornecedor: row.fornecedor || null,
+    produto,
+    quantidade: Number(row.quantidade ?? row.qtd ?? 0) || 0,
+    valor,
+    origem: row.origem || null,
+    status_compra: row.status_compra || row.statusCompra || 'Não informado',
+    disciplina: row.disciplina || null,
+    observacao: row.observacao || null,
+    source: row.source || 'painel',
+    metadata: row.metadata || {},
+    updated_at: new Date().toISOString()
+  };
+}
+
 function dataUrlToBuffer(dataUrl){
   const match = String(dataUrl || '').match(/^data:([^;]+);base64,(.+)$/);
   if(!match) throw new Error('Imagem inválida. Use data URL base64.');
   return { contentType: match[1], buffer: Buffer.from(match[2], 'base64') };
+}
+
+async function tableExistsOrIgnore(promise){
+  const { data, error } = await promise;
+  if(error){
+    const msg = String(error.message || '');
+    if(msg.includes('step_obras_costs') || msg.includes('does not exist') || msg.includes('relation')) return [];
+    throw error;
+  }
+  return data || [];
+}
+
+async function saveCosts(db, rawCosts){
+  const costs = Array.isArray(rawCosts) ? rawCosts.map(cleanCost).filter(r => r.produto || r.setor || Number(r.valor)) : [];
+  // Substitui a tabela de custos do painel. Não mexe nas obras, mapa ou fotos.
+  try{
+    const { error: delError } = await db.from('step_obras_costs').delete().neq('row_key', '__never__');
+    if(delError) throw delError;
+    for(let i=0;i<costs.length;i+=500){
+      const chunk = costs.slice(i,i+500);
+      if(!chunk.length) continue;
+      const { error } = await db.from('step_obras_costs').upsert(chunk, { onConflict:'row_key' });
+      if(error) throw error;
+    }
+    return { saved: costs.length, warning:null };
+  }catch(error){
+    const msg = String(error.message || '');
+    if(msg.includes('step_obras_costs') || msg.includes('does not exist') || msg.includes('relation')){
+      return { saved:0, warning:'Tabela step_obras_costs não encontrada. Rode o patch SQL v17 para habilitar a tabela detalhada de custos.' };
+    }
+    throw error;
+  }
 }
 
 exports.handler = async (event) => {
@@ -117,6 +168,10 @@ exports.handler = async (event) => {
 
       if(photoError) throw photoError;
 
+      const costs = await tableExistsOrIgnore(
+        db.from('step_obras_costs').select('*').order('item_id', { ascending:true }).order('id', { ascending:true })
+      );
+
       const bucket = process.env.SUPABASE_BUCKET || 'step-obras-evidencias';
       const photosWithUrls = (photos || []).map((p) => {
         let publicUrl = p.public_url || '';
@@ -132,7 +187,7 @@ exports.handler = async (event) => {
         return !acc || (t && t > acc) ? t : acc;
       }, null);
 
-      return response(200, { ok:true, items: items || [], photos: photosWithUrls, updatedAt });
+      return response(200, { ok:true, items: items || [], photos: photosWithUrls, costs, updatedAt });
     }
 
     if(event.httpMethod !== 'POST') return response(405, { ok:false, error:'Método não permitido.' });
@@ -164,10 +219,8 @@ exports.handler = async (event) => {
           value:{ mapZoom: Number(body.mapZoom) || 1, savedAt: new Date().toISOString() },
           updated_at:new Date().toISOString()
         }, { onConflict:'key' });
-      }catch(e){ /* config table is optional */ }
-      try{
-        await db.from('step_obras_history').insert({ action:'map_save', new_data:{ items:saved, mapZoom:body.mapZoom }, actor_name:'step_panel' });
-      }catch(e){ /* history is optional */ }
+      }catch(e){ }
+      try{ await db.from('step_obras_history').insert({ action:'map_save', new_data:{ items:saved, mapZoom:body.mapZoom }, actor_name:'step_panel' }); }catch(e){ }
       return response(200, { ok:true, saved: saved.length });
     }
 
@@ -180,6 +233,27 @@ exports.handler = async (event) => {
       return response(200, { ok:true, item:data });
     }
 
+    if(body.action === 'save_costs'){
+      const result = await saveCosts(db, body.costs || []);
+      try{ await db.from('step_obras_history').insert({ action:'costs_save', new_data:{ count: result.saved, warning: result.warning }, actor_name:'step_panel' }); }catch(e){}
+      return response(200, { ok:true, ...result });
+    }
+
+    if(body.action === 'import_bulk'){
+      const items = Array.isArray(body.items) ? body.items.map(cleanItem).filter(i=>i.id) : [];
+      let itemSaved = 0;
+      for(let i=0;i<items.length;i+=200){
+        const chunk = items.slice(i,i+200);
+        if(!chunk.length) continue;
+        const { error } = await db.from('step_obras_items').upsert(chunk, { onConflict:'id' });
+        if(error) throw error;
+        itemSaved += chunk.length;
+      }
+      const costResult = await saveCosts(db, body.costs || []);
+      try{ await db.from('step_obras_history').insert({ action:'bulk_import', new_data:{ items:itemSaved, costs:costResult.saved, warning:costResult.warning }, actor_name:'step_panel' }); }catch(e){}
+      return response(200, { ok:true, itemsSaved:itemSaved, costsSaved:costResult.saved, warning:costResult.warning });
+    }
+
     if(body.action === 'upload_photo'){
       const itemId = String(body.itemId || '').trim();
       if(!itemId) return response(400, { ok:false, error:'Imagem sem item vinculado.' });
@@ -190,10 +264,7 @@ exports.handler = async (event) => {
       const safeName = String(photo.name || 'imagem').normalize('NFD').replace(/[\u0300-\u036f]/g,'').replace(/[^a-zA-Z0-9._-]+/g,'-').slice(0,80);
       const storagePath = `${itemId}/${Date.now()}-${safeName || `foto.${ext}`}`;
 
-      const { error: uploadError } = await db.storage.from(bucket).upload(storagePath, buffer, {
-        contentType,
-        upsert:false
-      });
+      const { error: uploadError } = await db.storage.from(bucket).upload(storagePath, buffer, { contentType, upsert:false });
       if(uploadError) throw uploadError;
 
       const { data: urlData } = db.storage.from(bucket).getPublicUrl(storagePath);

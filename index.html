@@ -216,8 +216,17 @@
     .toast{position:fixed;right:22px;bottom:22px;background:#07111f;border:1px solid rgba(59,163,255,.30);box-shadow:var(--shadow);border-radius:18px;padding:14px 16px;color:#fff;z-index:100;display:none;max-width:360px}.toast.show{display:block;animation:pop .22s ease both}@keyframes pop{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:none}}
     .mobile-nav{display:none;margin-bottom:16px}.mobile-nav select{width:100%}
     .conf-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:16px}.conf-card p{color:var(--muted);line-height:1.48;font-size:13px}.code{font-family:Consolas,monospace;background:rgba(0,0,0,.25);border:1px solid var(--line);border-radius:12px;padding:12px;white-space:pre-wrap;color:#d8e6f7;font-size:12px;line-height:1.45;overflow:auto}
+
+    .cost-table-actions{display:flex;gap:10px;align-items:center;flex-wrap:wrap;justify-content:flex-end}
+    .cost-table-actions .field{min-width:260px}
+    .mobile-tip{display:none;margin:10px 0 0;padding:10px 12px;border:1px dashed rgba(59,163,255,.35);border-radius:14px;background:rgba(59,163,255,.08);color:#d8e6f7;font-size:12px;line-height:1.38}
+    .map-note-box{margin-top:12px;border:1px solid rgba(255,255,255,.10);border-radius:16px;background:rgba(255,255,255,.035);padding:12px;color:var(--muted);font-size:13px;line-height:1.45}
+    .map-note-box b{color:var(--text);display:block;margin-bottom:5px}
+    .table-wrap.compact table{min-width:1180px}
+    .table-wrap.compact td,.table-wrap.compact th{padding:10px 10px}
     @media (max-width: 1250px){.kpis{grid-template-columns:repeat(3,1fr)}.layout-2,.map-shell{grid-template-columns:1fr}.map-detail{order:-1}.map-stage{max-height:none}.modal-body{grid-template-columns:1fr}.work-preview-wrap{grid-template-columns:1fr}}
     @media (max-width: 780px){aside{display:none}.mobile-nav{display:block}.topbar{display:block}.actions{justify-content:flex-start;margin-top:15px}.kpis,.layout-3,.conf-grid{grid-template-columns:1fr}.title h2{font-size:23px}main{padding:16px}.card{padding:15px}.bar-row{grid-template-columns:1fr}.map-photo-grid{grid-template-columns:1fr}.modal-body{padding:15px}.form-grid{grid-template-columns:1fr}.table-tools .field{width:100%}}
+    @media (max-width: 780px){aside{display:none}.mobile-nav{display:block;position:sticky;top:0;z-index:30;background:rgba(7,17,31,.92);padding:8px 0}.topbar{display:block}.actions{justify-content:flex-start;margin-top:15px}.actions .btn{flex:1 1 150px}.kpis,.layout-3,.conf-grid{grid-template-columns:1fr}.title h2{font-size:23px}main{padding:12px}.card{padding:14px;border-radius:18px}.bar-row{grid-template-columns:1fr}.map-shell{grid-template-columns:1fr}.map-detail{order:-1}.map-head{display:block}.map-tools{justify-content:flex-start;margin-top:12px}.map-tools .btn{flex:1 1 120px}.map-stage{max-height:58vh;-webkit-overflow-scrolling:touch}.map-inner{width:920px;min-width:760px}.marker{width:38px;height:38px;font-size:12px;border-width:3px}.modal-body{padding:14px;grid-template-columns:1fr;max-height:72dvh}.modal-head{padding:14px}.modal-actions{padding:12px}.form-grid{grid-template-columns:1fr}.table-tools .field{width:100%}.cost-table-actions{justify-content:flex-start}.cost-table-actions .field{min-width:0;width:100%}.mobile-tip{display:block}.work-preview-dialog{width:98vw}.work-preview-wrap{grid-template-columns:1fr;padding:12px;max-height:74dvh}.work-preview-hero{min-height:220px}.work-preview-hero img{height:min(44vh,360px)}dialog{width:96vw;max-height:92dvh;border-radius:20px}.photo-preview-wrap{padding:12px}.dropzone{font-size:13px}.dropzone input{font-size:14px}}
     @media print{body{background:#fff;color:#111}.app{display:block}aside,.mobile-nav,.actions,.table-tools,.btn,.marker{display:none!important}main{padding:0;max-width:none}.section{display:block!important;page-break-after:always}.card{box-shadow:none;background:#fff;color:#111;border:1px solid #ddd}.map-stage{max-height:none;overflow:visible}.map-inner{width:100%}th,td{color:#111}.title p,.kpi small,.muted{color:#555}.map-shell,.layout-2,.layout-3{grid-template-columns:1fr}.section:not(#sec-overview):not(#sec-map):not(#sec-costs){display:none!important}}
   </style>
 </head>
@@ -239,13 +248,13 @@
       <div class="topbar">
         <div class="title">
           <h2 id="pageTitle">Painel Executivo de Obras e Melhorias</h2>
-          <p>Controle visual da carteira de melhorias da base STEP, com status das obras, avanço físico, custos, pendências e evidências fotográficas por item da planta. Versão v16 - Painel Online STEP + Supabase, sem PIN.</p>
-        </div>
+          <p>Controle visual da carteira de melhorias da base STEP, com status das obras, avanço físico, custos, pendências e evidências fotográficas por item da planta. Versão v17 - Painel Online STEP + Supabase, mobile, importação Excel/JSON e tabela de custos.</p>
+        <div class="mobile-tip">No telefone: abra a obra, toque em <b>Atualizar obra</b> e use <b>Incluir imagens</b> para tirar foto ou anexar da galeria. A importação agora aceita Excel, CSV e JSON.</div></div>
         <div class="actions">
           <button class="btn" onclick="print()">🖨️ Imprimir</button>
           <button class="btn" onclick="exportState()">⬇️ Exportar dados</button>
-          <label class="btn" for="importFile">⬆️ Importar dados</label>
-          <input id="importFile" type="file" accept="application/json" hidden />
+          <label class="btn" for="importFile">⬆️ Importar Excel/JSON</label>
+          <input id="importFile" type="file" accept=".json,.xlsx,.xls,.csv,application/json,application/vnd.openxmlformats-officedocument.spreadsheetml.sheet,application/vnd.ms-excel,text/csv" hidden />
           <button class="btn primary" onclick="openFirstCritical()">⚡ Ver crítico</button>
         </div>
       </div>
@@ -314,6 +323,7 @@
           <div class="card"><div class="panel-title"><div><h3>Custo por status de compra</h3><p>Separação entre comprado, em orçamento, cancelado, não aprovado e demais status.</p></div></div><div class="bar-list" id="costStatusBars"></div></div>
           <div class="card"><div class="panel-title"><div><h3>Custo por item da planta</h3><p>Ranking dos principais itens de melhoria por valor identificado.</p></div></div><div class="bar-list" id="itemCostBars"></div></div>
         </div>
+        <div class="card" style="margin-top:16px"><div class="panel-title"><div><h3>Tabela detalhada de custos</h3><p>Linhas importadas da aba <b>Custos x Execução</b>. Use a busca para localizar setor, fornecedor, produto, pedido ou status.</p></div><div class="cost-table-actions"><input class="field" id="costSearch" placeholder="Buscar custo, fornecedor, setor ou pedido" /></div></div><div class="table-wrap compact"><table><thead><tr><th>Item</th><th>Setor</th><th>Cotação</th><th>Pedido</th><th>Fornecedor</th><th>Produto / descrição</th><th>Qtd.</th><th>Valor</th><th>Status compra</th><th>Disciplina</th></tr></thead><tbody id="costDetailBody"></tbody></table></div></div>
         <div class="card" style="margin-top:16px"><div class="panel-title"><div><h3>Itens sem orçamento/custo vinculado</h3><p>Esses itens precisam de tratamento antes de apresentação financeira oficial.</p></div></div><div class="table-wrap"><table><thead><tr><th>Item</th><th>Atividade</th><th>Status</th><th>Responsável</th><th>Ação recomendada</th></tr></thead><tbody id="noCostBody"></tbody></table></div></div>
       </section>
 
@@ -334,7 +344,7 @@
       <section class="section" id="sec-config">
         <div class="conf-grid">
           <div class="card conf-card"><h3>Como usar</h3><p>Este painel está preparado para publicação online com sincronização no Supabase. Abra o site, clique em <b>Ajustar posições</b>, arraste os números da planta e depois clique em <b>Salvar mapa</b> para gravar as posições no banco. Assim, ao abrir em navegador anônimo ou em outro computador, o mapa carrega as posições salvas no Supabase.</p><p>O arquivo principal é o index.html e a sincronização é feita pela rota interna <b>/api/obras</b>.</p></p></div>
-          <div class="card conf-card"><h3>Próxima evolução recomendada</h3><p>A versão atual sincroniza os dados com Supabase: leitura da carteira, salvamento das posições do mapa, atualização de obra e envio de imagens para o Storage. Configure as variáveis de ambiente do site para ativar a sincronização.</p><div class="code">Módulos futuros:\n- Login por perfil\n- Banco de dados central\n- Upload de fotos por obra\n- Histórico de alteração por usuário\n- Aprovação por responsável\n- Exportação PDF executiva</div></div>
+          <div class="card conf-card"><h3>Próxima evolução recomendada</h3><p>A versão atual sincroniza os dados com Supabase: leitura da carteira, salvamento das posições do mapa, atualização de obra, envio de imagens pelo telefone e importação de Excel/JSON para atualizar obras e custos. Configure as variáveis de ambiente do site para ativar a sincronização.</p><div class="code">Módulos futuros:\n- Login por perfil\n- Banco de dados central\n- Upload de fotos por obra\n- Histórico de alteração por usuário\n- Aprovação por responsável\n- Exportação PDF executiva</div></div>
           <div class="card conf-card"><h3>Edição direta</h3><p>Esta versão não solicita PIN. Ao clicar em <b>Salvar mapa</b>, <b>Atualizar obra</b> ou incluir imagens, o painel grava diretamente no Supabase através da rota segura do site.</p><span class="pill">Sem PIN</span></div>
           <div class="card conf-card"><h3>Reset local</h3><p>Use somente se quiser voltar ao estado original do modelo e apagar atualizações deste navegador.</p><button class="btn danger" onclick="resetState()">Apagar dados locais e restaurar modelo</button></div>
           <div class="card conf-card"><h3>Observação importante</h3><p>Como é uma solução HTML local, imagens muito grandes são comprimidas antes de salvar. Mesmo assim, navegadores têm limite de armazenamento. Para muitos anexos, recomendo migrar o armazenamento das fotos para nuvem.</p></div>
@@ -368,7 +378,7 @@
         <div class="dropzone">
           <b>Incluir imagens da obra</b><br>
           Fotos de antes/depois, avanço, projeto, evidência de compra ou pendência.<br>
-          <input type="file" id="mPhotos" accept="image/*" multiple />
+          <input type="file" id="mPhotos" accept="image/*" capture="environment" multiple />
         </div>
         <div class="gallery" id="modalGallery"></div>
       </div>
@@ -401,6 +411,7 @@
 
   <div class="toast" id="toast"></div>
 
+  <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
   <script>
     const STORAGE_KEY = 'step-obras-dashboard-v1';
     const statusPalette = {
@@ -461,15 +472,25 @@
     let remoteOnline = false;
     const API_URL = '/api/obras';
 
+    function ensureStateShape(obj){
+      const base = obj && typeof obj === 'object' ? obj : {};
+      base.version = base.version || 1;
+      base.updatedAt = base.updatedAt || new Date().toISOString();
+      base.items = Array.isArray(base.items) ? base.items : seedItems.slice();
+      base.photos = base.photos && typeof base.photos === 'object' ? base.photos : {};
+      base.history = Array.isArray(base.history) ? base.history : [];
+      base.costs = Array.isArray(base.costs) ? base.costs : [];
+      return base;
+    }
     function loadState(){
       try{
         const raw = localStorage.getItem(STORAGE_KEY);
         if(raw){
           const parsed = JSON.parse(raw);
-          if(parsed && Array.isArray(parsed.items)) return parsed;
+          if(parsed && Array.isArray(parsed.items)) return ensureStateShape(parsed);
         }
       }catch(e){console.warn(e)}
-      return {version:1, updatedAt:new Date().toISOString(), items: seedItems, photos:{}, history:[]};
+      return ensureStateShape({version:1, updatedAt:new Date().toISOString(), items: seedItems, photos:{}, history:[], costs:[]});
     }
     function saveState(note='Atualização manual'){
       state.updatedAt = new Date().toISOString();
@@ -553,6 +574,26 @@
       });
       return photos;
     }
+    function normalizeServerCosts(list){
+      return (list||[]).map((r,idx)=>({
+        rowKey:r.row_key || r.rowKey || `db-${idx}`,
+        itemId:String(r.item_id || r.itemId || '').trim(),
+        setor:r.setor || '',
+        cotacao:r.cotacao || '',
+        pedido:r.pedido || '',
+        fornecedor:r.fornecedor || '',
+        produto:r.produto || r.descricao || '',
+        quantidade:Number(r.quantidade ?? r.qtd ?? 0) || 0,
+        valor:Number(r.valor ?? r.value ?? 0) || 0,
+        origem:r.origem || '',
+        statusCompra:r.status_compra || r.statusCompra || 'Não informado',
+        disciplina:r.disciplina || '',
+        dataCotacao:r.data_cotacao || r.dataCotacao || '',
+        dataPedido:r.data_pedido || r.dataPedido || '',
+        observacao:r.observacao || '',
+        source:r.source || 'Supabase'
+      })).filter(r=>r.produto || r.setor || Number(r.valor));
+    }
     async function loadFromServer(manual=false){
       try{
         updateMapSyncPill('Carregando banco...');
@@ -562,6 +603,7 @@
         if(data && Array.isArray(data.items) && data.items.length){
           state.items = data.items.map(normalizeServerItem);
           if(data.photos) state.photos = normalizeServerPhotos(data.photos);
+          state.costs = Array.isArray(data.costs) ? normalizeServerCosts(data.costs) : (state.costs || []);
           state.updatedAt = data.updatedAt || new Date().toISOString();
           localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
           remoteOnline = true;
@@ -937,7 +979,190 @@
         </div>
         ${mapPhotosHtml(i)}
         <div class="detail-list" style="margin-top:18px"><div style="display:block"><span>Próxima ação</span><b style="display:block;text-align:left;margin-top:6px">${escapeHtml(i.next||'Sem ação cadastrada')}</b></div></div>
+        <div class="map-note-box"><b>Observações</b>${escapeHtml(i.notes||'Sem observações cadastradas para esta obra.')}</div>
         <div style="display:flex;gap:10px;flex-wrap:wrap;margin-top:16px"><button class="btn primary" onclick="openModal('${i.id}')">Atualizar obra</button><button class="btn" onclick="toggleMoveMode(true)">Mover na planta</button><button class="btn" onclick="goSection('works')">Ver tabela</button></div>`;
+    }
+
+    function normalizeLooseText(value){
+      return String(value ?? '').normalize('NFD').replace(/[\u0300-\u036f]/g,'').replace(/\s+/g,' ').trim().toLowerCase();
+    }
+    function parseNumberBR(value){
+      if(value === null || value === undefined || value === '') return 0;
+      if(typeof value === 'number') return Number.isFinite(value) ? value : 0;
+      let text=String(value).trim().replace(/R\$|\s/g,'');
+      if(text.includes(',') && text.includes('.')) text=text.replace(/\./g,'').replace(',', '.');
+      else if(text.includes(',')) text=text.replace(',', '.');
+      const n=Number(text.replace(/[^0-9.-]/g,''));
+      return Number.isFinite(n) ? n : 0;
+    }
+    function excelDateToISO(value){
+      if(!value) return '';
+      if(value instanceof Date && !isNaN(value)) return value.toISOString().slice(0,10);
+      if(typeof value === 'number'){
+        const d = new Date(Math.round((value - 25569) * 86400 * 1000));
+        return isNaN(d) ? '' : d.toISOString().slice(0,10);
+      }
+      const text=String(value).trim();
+      const m=text.match(/^(\d{1,2})[\/\-.](\d{1,2})[\/\-.](\d{2,4})$/);
+      if(m){ const y=Number(m[3].length===2 ? '20'+m[3] : m[3]); return `${y}-${String(m[2]).padStart(2,'0')}-${String(m[1]).padStart(2,'0')}`; }
+      const d=new Date(text); return isNaN(d) ? '' : d.toISOString().slice(0,10);
+    }
+    function normalizeImportedStatus(value){
+      const t=normalizeLooseText(value);
+      if(!t) return 'AG. PROJETO';
+      if(t.includes('conclu')) return 'DEMANDA CONCLUIDA';
+      if(t.includes('andamento')) return 'EM ANDAMENTO';
+      if(t.includes('material')) return 'AG. MATERIAL';
+      if(t.includes('cotac')) return 'AG. COTAÇÃO';
+      if(t.includes('aprov')) return 'AG. APROVAÇÃO';
+      if(t.includes('projeto')) return 'AG. PROJETO';
+      return statuses.includes(String(value).trim()) ? String(value).trim() : 'AG. PROJETO';
+    }
+    function normalizeImportedPriority(value){
+      const t=normalizeLooseText(value);
+      if(!t) return 'Média';
+      if(t.includes('crit')) return 'Crítica';
+      if(t.includes('alta')) return 'Alta';
+      if(t.includes('baixa')) return 'Baixa';
+      const n=parseNumberBR(value);
+      if(n>0){ if(n<=2) return 'Crítica'; if(n<=3) return 'Alta'; if(n<=4) return 'Média'; return 'Baixa'; }
+      return 'Média';
+    }
+    function normalizeProgress(value){
+      const n=parseNumberBR(value);
+      if(!n) return 0;
+      return Math.max(0, Math.min(100, n <= 1 ? n*100 : n));
+    }
+    function itemIdFromSetor(setor){
+      const text=normalizeLooseText(setor).toUpperCase();
+      let m=text.match(/SETOR\s*0?([0-9]{1,2})\s*([A-Z])?/i);
+      if(!m) m=text.match(/\b0?([0-9]{1,2})\s*([A-Z])?\b/i);
+      if(!m) return '';
+      const num=String(Number(m[1])).padStart(2,'0');
+      return num + (m[2] ? String(m[2]).toUpperCase() : '');
+    }
+    function buildHeaderMap(headers){
+      const map={};
+      headers.forEach((h,idx)=>{ const k=normalizeLooseText(h).replace(/[^a-z0-9]+/g,''); if(k) map[k]=idx; });
+      return map;
+    }
+    function pickByAliases(row, map, aliases){
+      for(const a of aliases){ const k=normalizeLooseText(a).replace(/[^a-z0-9]+/g,''); if(k in map) return row[map[k]]; }
+      return '';
+    }
+    function sheetRowsByHeader(wb, sheetCandidates, requiredAliases){
+      if(!window.XLSX) throw new Error('Biblioteca de Excel não carregada. Verifique a internet do navegador e tente novamente.');
+      const names=wb.SheetNames || [];
+      const target = names.find(n=>sheetCandidates.some(c=>normalizeLooseText(n).includes(normalizeLooseText(c)))) || names[0];
+      const ws=wb.Sheets[target];
+      if(!ws) return {sheetName:target, rows:[], map:{}};
+      const matrix=XLSX.utils.sheet_to_json(ws,{header:1, raw:true, defval:''});
+      let headerIndex=-1, map={};
+      for(let r=0;r<Math.min(matrix.length,40);r++){
+        const candidate=buildHeaderMap(matrix[r]||[]);
+        const ok=requiredAliases.every(aliasGroup=>aliasGroup.some(a=>normalizeLooseText(a).replace(/[^a-z0-9]+/g,'') in candidate));
+        if(ok){ headerIndex=r; map=candidate; break; }
+      }
+      if(headerIndex<0) return {sheetName:target, rows:[], map:{}};
+      return {sheetName:target, rows:matrix.slice(headerIndex+1).filter(row=>row.some(v=>String(v??'').trim()!=='')), map};
+    }
+    function extractPlannerItemsFromWorkbook(wb){
+      const {rows,map}=sheetRowsByHeader(wb,['Planejador de Projetos','Planejador','Projetos'],[['ITEM PLANTA BAIXA','Item'],['ATIVIDADE','Atividade']]);
+      return rows.map((row,idx)=>{
+        const id=String(pickByAliases(row,map,['ITEM PLANTA BAIXA','Item Planta','Item'])||'').trim();
+        if(!id || id.toLowerCase().startsWith('atividade')) return null;
+        return {
+          id,
+          area:(getItem(id)?.area)||`Setor ${id}`,
+          title:String(pickByAliases(row,map,['ATIVIDADE','Atividade'])||getItem(id)?.title||'Obra sem título').trim(),
+          status:normalizeImportedStatus(pickByAliases(row,map,['STATUS','Status'])),
+          progress:normalizeProgress(pickByAliases(row,map,['PORCENTAGEM CONCLUÍDA','% concluída','Porcentagem concluida'])),
+          owner:String(pickByAliases(row,map,['RESPONSAVEL','RESPONSÁVEL','Responsavel'])||getItem(id)?.owner||'A definir').trim(),
+          priority:normalizeImportedPriority(pickByAliases(row,map,['PRIORIDADE DE EXECUÇÃO','Prioridade','Prioridade de Execucao'])),
+          due:excelDateToISO(pickByAliases(row,map,['DATA DE CONCLUSÃO | N° COTAÇÃO','Data de conclusão','Data conclusao'])),
+          next:String(pickByAliases(row,map,['AÇÃO','Acao','Próxima ação','Proxima acao'])||'').trim(),
+          notes:String(pickByAliases(row,map,['OBSERVAÇÕES','Observacoes','Observações'])||'').trim(),
+          x:getItem(id)?.x ?? 50,
+          y:getItem(id)?.y ?? 50,
+          cost:Number(getItem(id)?.cost)||0
+        };
+      }).filter(Boolean);
+    }
+    function extractCostsFromWorkbook(wb){
+      const {rows,map}=sheetRowsByHeader(wb,['Custos x Execução','Custos','Execução'],[['SETOR'],['VALOR']]);
+      return rows.map((row,idx)=>{
+        const setor=String(pickByAliases(row,map,['SETOR','Setor'])||'').trim();
+        const produto=String(pickByAliases(row,map,['PRODUTO','Produto','Descrição','Descricao'])||'').trim();
+        const valor=parseNumberBR(pickByAliases(row,map,['VALOR','Valor']));
+        if(!setor && !produto && !valor) return null;
+        const itemId=itemIdFromSetor(setor);
+        return {
+          rowKey:`xlsx-${idx+1}-${normalizeLooseText(setor).slice(0,24)}-${normalizeLooseText(produto).slice(0,24)}-${valor}`,
+          itemId,
+          setor,
+          cotacao:String(pickByAliases(row,map,['COTACAO','COTAÇÃO','Cotação'])||'').trim(),
+          pedido:String(pickByAliases(row,map,['PEDIDO','Pedido'])||'').trim(),
+          fornecedor:String(pickByAliases(row,map,['FORNECEDOR','FORNECEDOR ','Fornecedor'])||'').trim(),
+          produto,
+          quantidade:parseNumberBR(pickByAliases(row,map,['QT PEDIDA','QT\nPEDIDA','Quantidade','Qtd'])),
+          valor,
+          origem:String(pickByAliases(row,map,['ORIGEM','Origem'])||'').trim(),
+          statusCompra:String(pickByAliases(row,map,['STATUS DA COMPRA','STATUS DA COMRPA','Status Compra'])||'Não informado').trim() || 'Não informado',
+          disciplina:String(pickByAliases(row,map,['DISCIPLINA','Disciplina'])||'').trim(),
+          dataCotacao:excelDateToISO(pickByAliases(row,map,['DT COTACAO','DT\nCOTACAO','Data cotação','Data cotacao'])),
+          dataPedido:excelDateToISO(pickByAliases(row,map,['DT PEDIDO','DT\nPEDIDO','Data pedido'])),
+          source:'Excel importado'
+        };
+      }).filter(Boolean);
+    }
+    function mergeImportedItems(current, imported, costs){
+      const byId=new Map((current||[]).map(i=>[String(i.id), {...i}]));
+      const costByItem={};
+      (costs||[]).forEach(c=>{ if(c.itemId) costByItem[c.itemId]=(costByItem[c.itemId]||0)+(Number(c.valor)||0); });
+      imported.forEach(item=>{
+        const old=byId.get(item.id)||{};
+        byId.set(item.id, {...old, ...item, x:old.x ?? item.x ?? 50, y:old.y ?? item.y ?? 50, cost: costByItem[item.id] ?? old.cost ?? item.cost ?? 0});
+      });
+      Object.keys(costByItem).forEach(id=>{
+        const old=byId.get(id);
+        if(old) byId.set(id,{...old,cost:costByItem[id]});
+      });
+      return Array.from(byId.values()).sort((a,b)=>String(a.id).localeCompare(String(b.id),'pt-BR',{numeric:true}));
+    }
+    async function importExcelOrCsv(file){
+      if(!window.XLSX) throw new Error('Biblioteca de Excel não carregou. Confirme conexão com internet e recarregue a página.');
+      const buffer=await file.arrayBuffer();
+      const wb=XLSX.read(buffer,{type:'array',cellDates:true});
+      const importedItems=extractPlannerItemsFromWorkbook(wb);
+      const importedCosts=extractCostsFromWorkbook(wb);
+      if(!importedItems.length && !importedCosts.length) throw new Error('Não encontrei dados válidos nas abas Planejador de Projetos / Custos x Execução.');
+      if(importedItems.length) state.items=mergeImportedItems(state.items, importedItems, importedCosts);
+      if(importedCosts.length) state.costs=importedCosts;
+      saveState(`Importado arquivo ${file.name}: ${importedItems.length} obras e ${importedCosts.length} custos`);
+      await saveBulkToServer({items: importedItems.length ? state.items : [], costs: importedCosts});
+      showToast(`Importação concluída: ${importedItems.length} obras e ${importedCosts.length} custos.`);
+    }
+    async function saveBulkToServer(payload){
+      try{
+        await apiPostAuthorized({action:'import_bulk', items:payload.items||[], costs:payload.costs||[]});
+        remoteOnline=true; updateMapSyncPill(); showToast('Importação também salva no Supabase.');
+      }catch(err){ showToast(`Importou localmente, mas não salvou no banco: ${escapeHtml(err.message)}`); }
+    }
+    function getCostRows(){
+      const rows=Array.isArray(state.costs) ? state.costs.filter(r=>r && (r.produto || r.setor || Number(r.valor))) : [];
+      if(rows.length) return rows;
+      return state.items.filter(i=>Number(i.cost)).map(i=>({rowKey:`item-${i.id}`, itemId:i.id, setor:i.area, cotacao:'', pedido:'', fornecedor:'', produto:i.title, quantidade:1, valor:Number(i.cost)||0, origem:'Painel', statusCompra:i.status_compra||'Não informado', disciplina:'', source:'Resumo por item'}));
+    }
+    function costSummaryFromRows(rows){
+      const grouped={};
+      rows.forEach(r=>{ const k=(r.statusCompra || r.status_compra || 'Não informado').trim() || 'Não informado'; grouped[k]=(grouped[k]||0)+(Number(r.valor)||0); });
+      return Object.entries(grouped).map(([status,value])=>({status,value})).sort((a,b)=>b.value-a.value);
+    }
+    function filteredCostRows(){
+      const q=(document.getElementById('costSearch')?.value||'').toLowerCase().trim();
+      const rows=getCostRows();
+      if(!q) return rows;
+      return rows.filter(r=>[r.itemId,r.setor,r.cotacao,r.pedido,r.fornecedor,r.produto,r.statusCompra,r.disciplina,r.origem].join(' ').toLowerCase().includes(q));
     }
     function filteredItems(){
       const q=(document.getElementById('searchInput')?.value||'').toLowerCase().trim();
@@ -962,16 +1187,20 @@
         </tr>`).join('') || `<tr><td colspan="8"><div class="empty">Nenhum item encontrado com os filtros atuais.</div></td></tr>`;
     }
     function renderCosts(){
-      const comprado=costStatusRows.find(r=>r.status==='Comprado')?.value||0;
-      const total=costStatusRows.reduce((a,r)=>a+r.value,0);
-      const naoAprovado=(costStatusRows.find(r=>r.status==='Orçamento não Aprovado')?.value||0)+(costStatusRows.find(r=>r.status==='Cancelado')?.value||0);
+      const costRows=getCostRows();
+      const summary=costSummaryFromRows(costRows);
+      const total=costRows.reduce((a,r)=>a+(Number(r.valor)||0),0);
+      const comprado=summary.filter(r=>normalizeLooseText(r.status).includes('comprado')).reduce((a,r)=>a+r.value,0);
+      const naoAprovado=summary.filter(r=>normalizeLooseText(r.status).includes('cancel') || normalizeLooseText(r.status).includes('nao aprovado')).reduce((a,r)=>a+r.value,0);
       const noCost=state.items.filter(i=>!Number(i.cost)).length;
-      const k=[['Total bruto',fmtMoney(total),'Base financeira analisada'],['Comprado',fmtMoney(comprado),'Realizado/compra lançada'],['Cancelado + não aprovado',fmtMoney(naoAprovado),'Não tratar como custo aprovado'],['Itens sem custo',noCost,'Precisam de orçamento'],['Custo vinculado aos itens',fmtMoney(costTotal()),'Por melhoria cadastrada'],['Maior item',fmtMoney(Math.max(...state.items.map(i=>Number(i.cost)||0))),'Ponte rolante / Galpão 01']];
+      const k=[['Total de custos',fmtMoney(total),'Tabela detalhada / itens'],['Comprado',fmtMoney(comprado),'Realizado/compra lançada'],['Cancelado + não aprovado',fmtMoney(naoAprovado),'Não tratar como custo aprovado'],['Itens sem custo',noCost,'Precisam de orçamento'],['Linhas de custo',costRows.length,'Registros na tabela'],['Maior item',fmtMoney(Math.max(...state.items.map(i=>Number(i.cost)||0),0)),'Maior valor vinculado']];
       document.getElementById('costKpis').innerHTML=k.map(x=>`<div class="card kpi"><span>${x[0]}</span><strong style="font-size:${String(x[1]).length>13?'20px':'26px'}">${x[1]}</strong><small>${x[2]}</small></div>`).join('');
-      const max=Math.max(...costStatusRows.map(r=>r.value),1);
-      document.getElementById('costStatusBars').innerHTML=costStatusRows.slice().sort((a,b)=>b.value-a.value).map(r=>`<div class="bar-row"><b>${r.status}</b><div class="bar"><i style="width:${(r.value/max)*100}%;background:${r.status.includes('Cancelado')?'var(--red)':r.status.includes('Aprovado')?'var(--orange)':'linear-gradient(90deg,var(--blue),var(--cyan))'}"></i></div><span>${fmtMoney(r.value)}</span></div>`).join('');
+      const max=Math.max(...summary.map(r=>r.value),1);
+      document.getElementById('costStatusBars').innerHTML=summary.map(r=>`<div class="bar-row"><b>${escapeHtml(r.status)}</b><div class="bar"><i style="width:${(r.value/max)*100}%;background:${normalizeLooseText(r.status).includes('cancel')?'var(--red)':normalizeLooseText(r.status).includes('nao aprovado')?'var(--orange)':'linear-gradient(90deg,var(--blue),var(--cyan))'}"></i></div><span>${fmtMoney(r.value)}</span></div>`).join('') || '<div class="empty">Nenhum custo importado.</div>';
       const topItems=state.items.slice().sort((a,b)=>(Number(b.cost)||0)-(Number(a.cost)||0)).slice(0,10); const imax=Math.max(...topItems.map(i=>Number(i.cost)||0),1);
       document.getElementById('itemCostBars').innerHTML=topItems.map(i=>`<div class="bar-row"><b>${i.id} · ${escapeHtml(i.area)}</b><div class="bar"><i style="width:${((Number(i.cost)||0)/imax)*100}%;background:${statusColor(i.status)}"></i></div><span>${fmtMoney(i.cost)}</span></div>`).join('');
+      const rows=filteredCostRows().slice(0,600);
+      document.getElementById('costDetailBody').innerHTML=rows.map(r=>`<tr><td><b>${escapeHtml(r.itemId||'-')}</b></td><td>${escapeHtml(r.setor||'')}</td><td>${escapeHtml(r.cotacao||'')}</td><td>${escapeHtml(r.pedido||'')}</td><td>${escapeHtml(r.fornecedor||'')}</td><td><span class="td-title">${escapeHtml(r.produto||'')}</span><span class="td-sub">${escapeHtml(r.origem||r.source||'')}</span></td><td>${Number(r.quantidade)||''}</td><td><b>${fmtMoney(r.valor)}</b></td><td>${escapeHtml(r.statusCompra||'Não informado')}</td><td>${escapeHtml(r.disciplina||'')}</td></tr>`).join('') || `<tr><td colspan="10"><div class="empty">Nenhum custo encontrado. Use Importar Excel/JSON e envie a planilha com a aba Custos x Execução.</div></td></tr>`;
       document.getElementById('noCostBody').innerHTML=state.items.filter(i=>!Number(i.cost)).map(i=>`<tr><td><b>${i.id}</b></td><td>${escapeHtml(i.title)}</td><td><span class="status-pill pill" style="background:${statusColor(i.status)}">${i.status}</span></td><td>${escapeHtml(i.owner)}</td><td>${escapeHtml(i.next||'Vincular orçamento/cotação')}</td></tr>`).join('') || `<tr><td colspan="5"><div class="empty">Todos os itens possuem custo vinculado.</div></td></tr>`;
     }
     function renderEvidence(){
@@ -1059,12 +1288,21 @@
     }
     importFile.addEventListener('change', async e=>{
       const file=e.target.files[0]; if(!file) return;
-      try{ const text=await file.text(); const parsed=JSON.parse(text); if(!Array.isArray(parsed.items)) throw new Error('Arquivo inválido'); state=parsed; saveState('Dados importados via JSON'); showToast('Dados importados com sucesso.'); }
-      catch(err){showToast('Arquivo inválido. Use um JSON exportado por este painel.')} finally{e.target.value=''}
+      try{
+        const name=(file.name||'').toLowerCase();
+        if(name.endsWith('.json')){
+          const text=await file.text(); const parsed=JSON.parse(text); if(!Array.isArray(parsed.items)) throw new Error('Arquivo JSON inválido'); state=ensureStateShape(parsed); saveState('Dados importados via JSON'); await saveBulkToServer({items:state.items, costs:state.costs||[]}); showToast('JSON importado com sucesso.');
+        }else if(name.endsWith('.xlsx') || name.endsWith('.xls') || name.endsWith('.csv')){
+          await importExcelOrCsv(file);
+        }else{
+          throw new Error('Formato não suportado. Use .xlsx, .xls, .csv ou .json.');
+        }
+      }
+      catch(err){showToast(`Erro na importação: ${escapeHtml(err.message)}`)} finally{e.target.value=''}
     });
     function resetState(){if(!confirm('Isso apagará as alterações locais deste navegador. Continuar?')) return; localStorage.removeItem(STORAGE_KEY); state=loadState(); mapZoom=Number(state.mapZoom)||1; selectedId=state.items[0]?.id; renderAll(); showToast('Modelo original restaurado.');}
 
-    searchInput.addEventListener('input', renderWorks); statusFilter.addEventListener('change', renderWorks); priorityFilter.addEventListener('change', renderWorks);
+    searchInput.addEventListener('input', renderWorks); statusFilter.addEventListener('change', renderWorks); priorityFilter.addEventListener('change', renderWorks); document.addEventListener('input', e=>{ if(e.target && e.target.id==='costSearch') renderCosts(); });
     initNav(); setupMapZoom(); bootstrapPanel();
   </script>
 </body>
