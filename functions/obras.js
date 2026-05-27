@@ -1,4 +1,5 @@
 const { createClient } = require('@supabase/supabase-js');
+const crypto = require('crypto');
 
 const jsonHeaders = {
   'Content-Type': 'application/json; charset=utf-8',
@@ -53,6 +54,42 @@ function describeSupabaseEnv(){
     }))
   };
 }
+
+
+function getEditCredentials(){
+  return {
+    user: (process.env.STEP_EDIT_USER || process.env.STEP_ADMIN_USER || 'admin').trim(),
+    password: (process.env.STEP_EDIT_PASSWORD || process.env.STEP_ADMIN_PASSWORD || process.env.STEP_ADMIN_PIN || '031036').trim()
+  };
+}
+function tokenSecret(){
+  return (process.env.STEP_EDIT_TOKEN_SECRET || process.env.SUPABASE_SERVICE_ROLE_KEY || process.env.SUPABASE_SECRET_KEY || 'step-obras-local-token-secret').trim();
+}
+function signPayload(payload){
+  const body = Buffer.from(JSON.stringify(payload)).toString('base64url');
+  const sig = crypto.createHmac('sha256', tokenSecret()).update(body).digest('base64url');
+  return `${body}.${sig}`;
+}
+function verifyEditToken(token){
+  if(!token || typeof token !== 'string' || !token.includes('.')) return null;
+  const [body, sig] = token.split('.');
+  const expected = crypto.createHmac('sha256', tokenSecret()).update(body).digest('base64url');
+  if(!crypto.timingSafeEqual(Buffer.from(sig), Buffer.from(expected))) return null;
+  const payload = JSON.parse(Buffer.from(body, 'base64url').toString('utf8'));
+  if(!payload.exp || Date.now() > payload.exp) return null;
+  return payload;
+}
+function requireEditor(body){
+  const token = body?.editToken || body?.token || '';
+  const payload = verifyEditToken(token);
+  if(!payload) {
+    const err = new Error('Login de edição necessário para salvar alterações. A visualização permanece liberada.');
+    err.statusCode = 401;
+    throw err;
+  }
+  return payload;
+}
+
 
 function cleanItem(item = {}){
   return {
@@ -213,11 +250,24 @@ exports.handler = async (event) => {
 
     const body = event.body ? JSON.parse(event.body) : {};
 
+    if(body.action === 'login'){
+      const { user, password } = getEditCredentials();
+      const username = String(body.username || '').trim();
+      const pass = String(body.password || '').trim();
+      if(username !== user || pass !== password){
+        return response(401, { ok:false, error:'Usuário ou senha inválidos.' });
+      }
+      const expiresAt = new Date(Date.now() + 12 * 60 * 60 * 1000).toISOString();
+      const token = signPayload({ user, role:'editor', exp: Date.now() + 12 * 60 * 60 * 1000 });
+      return response(200, { ok:true, token, user, expiresAt });
+    }
+
     if(body.action === 'check_pin'){
-      return response(200, { ok:true, message:'Edição direta habilitada. Sem PIN.' });
+      return response(200, { ok:true, message:'Use o login de edição para salvar alterações.' });
     }
 
     if(body.action === 'save_map'){
+      requireEditor(body);
       const items = Array.isArray(body.items) ? body.items : [];
       const saved = [];
       for(const item of items){
@@ -244,6 +294,7 @@ exports.handler = async (event) => {
     }
 
     if(body.action === 'save_item'){
+      requireEditor(body);
       const payload = cleanItem(body.item || {});
       if(!payload.id) return response(400, { ok:false, error:'Item sem ID.' });
       const { data, error } = await db.from('step_obras_items').upsert(payload, { onConflict:'id' }).select('*').single();
@@ -253,12 +304,14 @@ exports.handler = async (event) => {
     }
 
     if(body.action === 'save_costs'){
+      requireEditor(body);
       const result = await saveCosts(db, body.costs || []);
       try{ await db.from('step_obras_history').insert({ action:'costs_save', new_data:{ count: result.saved, warning: result.warning }, actor_name:'step_panel' }); }catch(e){}
       return response(200, { ok:true, ...result });
     }
 
     if(body.action === 'import_bulk'){
+      requireEditor(body);
       const items = Array.isArray(body.items) ? body.items.map(cleanItem).filter(i=>i.id) : [];
       let itemSaved = 0;
       for(let i=0;i<items.length;i+=200){
@@ -274,6 +327,7 @@ exports.handler = async (event) => {
     }
 
     if(body.action === 'upload_photo'){
+      requireEditor(body);
       const itemId = String(body.itemId || '').trim();
       if(!itemId) return response(400, { ok:false, error:'Imagem sem item vinculado.' });
       const photo = body.photo || {};
@@ -303,6 +357,7 @@ exports.handler = async (event) => {
     }
 
     if(body.action === 'delete_photo'){
+      requireEditor(body);
       const photoId = body.photoId;
       const storagePath = body.storagePath;
       const bucket = process.env.SUPABASE_BUCKET || 'step-obras-evidencias';
@@ -321,6 +376,6 @@ exports.handler = async (event) => {
     const hint = /Invalid API key/i.test(message)
       ? 'Chave Supabase inválida no ambiente do site. Verifique se SUPABASE_SERVICE_ROLE_KEY é a service_role/secret key correta do projeto e não a publishable/anon key. Depois publique novamente.'
       : undefined;
-    return response(500, { ok:false, error:message, hint });
+    return response(error.statusCode || 500, { ok:false, error:message, hint });
   }
 };

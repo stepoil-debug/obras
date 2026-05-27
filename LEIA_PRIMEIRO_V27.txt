@@ -1,0 +1,17 @@
+STEP Painel de Obras - v27
+
+Alterações principais:
+- Custos: a busca por item agora filtra toda a tela de custos. Exemplo: digitando 01A, os cards, o gráfico por status, o ranking e a tabela mostram somente os custos do item 01A.
+- Login de edição: a visualização continua liberada, mas salvar mapa, editar obra, anexar/remover imagens, importar Excel/JSON e sincronizar custos exigem login.
+- O botão de login aparece no topo do painel e também na aba Configuração.
+
+Variáveis opcionais no Netlify:
+STEP_EDIT_USER=admin
+STEP_EDIT_PASSWORD=031036
+
+Se não cadastrar essas variáveis, o painel usa temporariamente admin / 031036.
+
+Publicação:
+1. Execute PUBLICAR_V27_FILTRO_CUSTO_LOGIN.cmd
+2. No Netlify, faça Clear cache and deploy site se necessário.
+3. Para testar edição, clique em Entrar para editar.

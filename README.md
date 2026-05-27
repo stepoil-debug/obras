@@ -26,3 +26,10 @@ Versão corrigida para carregar a planilha **Melhorias base STEP 25-05-26.xlsx**
 3. No Supabase, rode:
    `supabase/RODAR_ESTE_SQL_V20_STATUS_COMPRA_COMPLETO.sql`
 4. No painel, clique em **Recarregar banco** ou use Ctrl+F5.
+
+
+## Versão v27
+
+- Filtro de custos por item: digite `01A`, `01`, `02` etc. na aba Custos para recalcular a visão apenas daquele item.
+- Login de edição: visualização pública, edição protegida por usuário/senha.
+- Variáveis opcionais: `STEP_EDIT_USER` e `STEP_EDIT_PASSWORD`. Padrão temporário: `admin / 031036`.

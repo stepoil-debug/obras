@@ -234,6 +234,14 @@
     .map-note-box b{color:var(--text);display:block;margin-bottom:5px}
     .table-wrap.compact table{min-width:1180px}
     .table-wrap.compact td,.table-wrap.compact th{padding:10px 10px}
+
+    .auth-pill{display:inline-flex;align-items:center;gap:8px;border-radius:999px;padding:9px 12px;border:1px solid rgba(255,255,255,.14);background:rgba(255,255,255,.06);color:var(--soft);font-size:12px;font-weight:800;white-space:nowrap}
+    .auth-pill.logged{border-color:rgba(39,209,127,.45);background:rgba(39,209,127,.12);color:#dfffee}
+    .auth-pill.locked{border-color:rgba(247,201,72,.40);background:rgba(247,201,72,.09);color:#fff4c8}
+    .locked-note{border:1px dashed rgba(247,201,72,.35);background:rgba(247,201,72,.08);color:#fff4c8;border-radius:14px;padding:10px 12px;font-size:12px;line-height:1.35;margin-top:10px}
+    .login-box{display:grid;gap:12px;padding:20px}.login-box label{display:grid;gap:6px;color:var(--muted);font-size:12px;text-transform:uppercase;letter-spacing:.06em}.login-error{display:none;color:#ffd3d7;background:rgba(255,89,100,.10);border:1px solid rgba(255,89,100,.30);border-radius:12px;padding:10px;font-size:13px}.login-error.show{display:block}
+    .cost-filter-note{color:var(--muted);font-size:12px;margin-top:7px}.cost-filter-note b{color:var(--text)}
+
     @media (max-width: 1250px){.kpis{grid-template-columns:repeat(3,1fr)}.layout-2,.map-shell{grid-template-columns:1fr}.map-detail{order:-1}.map-stage{max-height:none}.modal-body{grid-template-columns:1fr}.work-preview-wrap{grid-template-columns:1fr}}
     @media (max-width: 780px){aside{display:none}.mobile-nav{display:block}.topbar{display:block}.actions{justify-content:flex-start;margin-top:15px}.kpis,.layout-3,.conf-grid{grid-template-columns:1fr}.title h2{font-size:23px}main{padding:16px}.card{padding:15px}.bar-row{grid-template-columns:1fr}.map-photo-grid{grid-template-columns:1fr}.modal-body{padding:15px}.form-grid{grid-template-columns:1fr}.table-tools .field{width:100%}}
     @media (max-width: 780px){aside{display:none}.mobile-nav{display:block;position:sticky;top:0;z-index:30;background:rgba(7,17,31,.92);padding:8px 0}.topbar{display:block}.actions{justify-content:flex-start;margin-top:15px}.actions .btn{flex:1 1 150px}.kpis,.layout-3,.conf-grid{grid-template-columns:1fr}.title h2{font-size:23px}main{padding:12px}.card{padding:14px;border-radius:18px}.bar-row{grid-template-columns:1fr}.map-shell{grid-template-columns:1fr}.map-detail{order:-1}.map-head{display:block}.map-tools{justify-content:flex-start;margin-top:12px}.map-tools .btn{flex:1 1 120px}.map-stage{max-height:none;min-height:52vh;-webkit-overflow-scrolling:touch}.map-inner{width:var(--map-width,100%)!important;min-width:0!important}.marker{width:38px;height:38px;font-size:12px;border-width:3px}.modal-body{padding:14px;grid-template-columns:1fr;max-height:72dvh}.modal-head{padding:14px}.modal-actions{padding:12px}.form-grid{grid-template-columns:1fr}.table-tools .field{width:100%}.cost-table-actions{justify-content:flex-start}.cost-table-actions .field{min-width:0;width:100%}.mobile-tip{display:block}.work-preview-dialog{width:98vw}.work-preview-wrap{grid-template-columns:1fr;padding:12px;max-height:74dvh}.work-preview-hero{min-height:220px}.work-preview-hero img{height:min(44vh,360px)}dialog{width:96vw;max-height:92dvh;border-radius:20px}.photo-preview-wrap{padding:12px}.dropzone{font-size:13px}.dropzone input{font-size:14px}}
@@ -258,14 +266,16 @@
       <div class="topbar">
         <div class="title">
           <h2 id="pageTitle">Painel Executivo de Obras e Melhorias</h2>
-          <p>Controle visual da carteira de melhorias da base STEP, com status das obras, avanço físico, custos, pendências e evidências fotográficas por item da planta. Versão v26 - Painel Online STEP + Supabase, exportação Excel com abas iguais à planilha base.</p>
+          <p>Controle visual da carteira de melhorias da base STEP, com status das obras, avanço físico, custos, pendências e evidências fotográficas por item da planta. Versão v27 - Painel Online STEP + Supabase, filtro de custos por item e edição protegida por login.</p>
         <div class="mobile-tip">No telefone: abra a obra, toque em <b>Atualizar obra</b> e use <b>Incluir imagens</b> para tirar foto ou anexar da galeria. A importação agora aceita Excel, CSV e JSON.</div></div>
         <div class="actions">
           <button class="btn" onclick="print()">🖨️ Imprimir</button>
           <button class="btn" onclick="exportState()">📊 Exportar Excel</button>
-          <label class="btn" for="importFile">⬆️ Importar Excel/JSON</label>
+          <button class="btn" onclick="selectImportFile()">⬆️ Importar Excel/JSON</button>
           <input id="importFile" type="file" accept=".json,.xlsx,.xls,.csv,application/json,application/vnd.openxmlformats-officedocument.spreadsheetml.sheet,application/vnd.ms-excel,text/csv" hidden />
           <button class="btn primary" onclick="openFirstCritical()">⚡ Ver crítico</button>
+          <button class="btn" id="loginBtn" onclick="openLoginModal()">🔐 Entrar para editar</button>
+          <span class="auth-pill locked" id="authStatus">Visualização livre</span>
         </div>
       </div>
 
@@ -333,7 +343,7 @@
           <div class="card"><div class="panel-title"><div><h3>Custo por status de compra</h3><p>Separação entre comprado, em orçamento, cancelado, não aprovado e demais status.</p></div></div><div class="bar-list" id="costStatusBars"></div></div>
           <div class="card"><div class="panel-title"><div><h3>Custo por item da planta</h3><p>Ranking dos principais itens de melhoria por valor identificado.</p></div></div><div class="bar-list" id="itemCostBars"></div></div>
         </div>
-        <div class="card" style="margin-top:16px"><div class="panel-title"><div><h3>Tabela detalhada de custos</h3><p>Dados importados da aba <b>Custos x Execução</b>. Use a busca para localizar setor, fornecedor, produto, pedido ou status.</p></div><div class="cost-table-actions"><button class="btn primary" onclick="syncSeedCostsToServer()">↻ Sincronizar custos da planilha</button><input class="field" id="costSearch" placeholder="Buscar custo, fornecedor, setor ou pedido" /></div></div><div class="table-wrap compact"><table><thead><tr><th>Item</th><th>Setor</th><th>Cotação</th><th>Pedido</th><th>Fornecedor</th><th>Produto / descrição</th><th>Qtd.</th><th>Valor</th><th>Status compra</th><th>Disciplina</th></tr></thead><tbody id="costDetailBody"></tbody></table></div></div>
+        <div class="card" style="margin-top:16px"><div class="panel-title"><div><h3>Tabela detalhada de custos</h3><p>Dados importados da aba <b>Custos x Execução</b>. Use a busca para localizar setor, fornecedor, produto, pedido, status ou filtre direto por item, exemplo: 01A.</p></div><div class="cost-table-actions"><button class="btn primary" onclick="syncSeedCostsToServer()">↻ Sincronizar custos da planilha</button><input class="field" id="costSearch" placeholder="Buscar item ex: 01A, fornecedor, setor, pedido ou status" /><div class="cost-filter-note" id="costFilterNote"></div></div></div><div class="table-wrap compact"><table><thead><tr><th>Item</th><th>Setor</th><th>Cotação</th><th>Pedido</th><th>Fornecedor</th><th>Produto / descrição</th><th>Qtd.</th><th>Valor</th><th>Status compra</th><th>Disciplina</th></tr></thead><tbody id="costDetailBody"></tbody></table></div></div>
         <div class="card" style="margin-top:16px"><div class="panel-title"><div><h3>Itens sem orçamento/custo vinculado</h3><p>Esses itens precisam de tratamento antes de apresentação financeira oficial.</p></div></div><div class="table-wrap"><table><thead><tr><th>Item</th><th>Atividade</th><th>Status</th><th>Responsável</th><th>Ação recomendada</th></tr></thead><tbody id="noCostBody"></tbody></table></div></div>
       </section>
 
@@ -355,7 +365,7 @@
         <div class="conf-grid">
           <div class="card conf-card"><h3>Como usar</h3><p>Este painel está preparado para publicação online com sincronização no Supabase. Abra o site, clique em <b>Ajustar posições</b>, arraste os números da planta e depois clique em <b>Salvar mapa</b> para gravar as posições no banco. Assim, ao abrir em navegador anônimo ou em outro computador, o mapa carrega as posições salvas no Supabase.</p><p>O arquivo principal é o index.html e a sincronização é feita pela rota interna <b>/api/obras</b>.</p></p></div>
           <div class="card conf-card"><h3>Próxima evolução recomendada</h3><p>A versão atual sincroniza os dados com Supabase: leitura da carteira, salvamento das posições do mapa, atualização de obra, envio de imagens pelo telefone e importação de Excel/JSON para atualizar obras e custos. Configure as variáveis de ambiente do site para ativar a sincronização.</p><div class="code">Módulos futuros:\n- Login por perfil\n- Banco de dados central\n- Upload de fotos por obra\n- Histórico de alteração por usuário\n- Aprovação por responsável\n- Exportação PDF executiva</div></div>
-          <div class="card conf-card"><h3>Edição direta</h3><p>Esta versão não solicita PIN. Ao clicar em <b>Salvar mapa</b>, <b>Atualizar obra</b> ou incluir imagens, o painel grava diretamente no Supabase através da rota segura do site.</p><span class="pill">Sem PIN</span></div>
+          <div class="card conf-card"><h3>Edição protegida</h3><p>A visualização fica liberada para todos. Para alterar mapa, obras, custos, fotos ou importar planilha, é necessário entrar com login de edição.</p><button class="btn primary" onclick="openLoginModal()">🔐 Entrar para editar</button> <button class="btn" onclick="logoutEditor()">Sair</button></div>
           <div class="card conf-card"><h3>Reset local</h3><p>Use somente se quiser voltar ao estado original do modelo e apagar atualizações deste navegador.</p><button class="btn danger" onclick="resetState()">Apagar dados locais e restaurar modelo</button></div>
           <div class="card conf-card"><h3>Observação importante</h3><p>Como é uma solução HTML local, imagens muito grandes são comprimidas antes de salvar. Mesmo assim, navegadores têm limite de armazenamento. Para muitos anexos, recomendo migrar o armazenamento das fotos para nuvem.</p></div>
         </div>
@@ -417,6 +427,19 @@
         <button class="btn primary" id="workPreviewEditBtn">Atualizar obra</button>
       </div>
     </div>
+  </dialog>
+
+
+
+  <dialog id="loginModal">
+    <div class="modal-head"><div><h3>Login de edição</h3><p>Visualização liberada. Entre apenas para alterar mapa, status, custos ou imagens.</p></div><button class="btn" onclick="closeLoginModal()">✕ Fechar</button></div>
+    <div class="login-box">
+      <div class="login-error" id="loginError"></div>
+      <label>Usuário<input class="field" id="editUser" autocomplete="username" placeholder="Ex.: admin" /></label>
+      <label>Senha<input class="field" id="editPass" type="password" autocomplete="current-password" placeholder="Senha de edição" /></label>
+      <div class="locked-note">Use as variáveis <b>STEP_EDIT_USER</b> e <b>STEP_EDIT_PASSWORD</b> no ambiente do site. Se não configurar, o padrão temporário é <b>admin / 031036</b>.</div>
+    </div>
+    <div class="modal-actions"><span class="pill">Somente edição exige login</span><div><button class="btn" onclick="closeLoginModal()">Cancelar</button> <button class="btn primary" onclick="performLogin()">Entrar</button></div></div>
   </dialog>
 
   <div class="toast" id="toast"></div>
@@ -771,6 +794,60 @@
     let remoteOnline = false;
     const API_URL = '/api/obras';
 
+    const EDIT_SESSION_KEY = 'step-obras-edit-session-v1';
+    let editSession = loadEditSession();
+
+    function loadEditSession(){
+      try{return JSON.parse(localStorage.getItem(EDIT_SESSION_KEY)||'null')||null;}catch(e){return null;}
+    }
+    function isEditorLogged(){
+      return !!(editSession && editSession.token && (!editSession.expiresAt || new Date(editSession.expiresAt).getTime() > Date.now()));
+    }
+    function updateAuthUi(){
+      const logged=isEditorLogged();
+      const status=document.getElementById('authStatus');
+      const btn=document.getElementById('loginBtn');
+      if(status){status.textContent=logged ? `Edição liberada${editSession?.user ? ' · '+editSession.user : ''}` : 'Visualização livre'; status.className='auth-pill '+(logged?'logged':'locked');}
+      if(btn){btn.textContent=logged ? '🔓 Sair da edição' : '🔐 Entrar para editar'; btn.onclick=logged ? logoutEditor : openLoginModal;}
+      document.body.classList.toggle('editor-logged', logged);
+    }
+    function openLoginModal(reason=''){
+      const modal=document.getElementById('loginModal');
+      const err=document.getElementById('loginError');
+      if(err){err.textContent=reason ? `Faça login para ${reason}.` : ''; err.classList.toggle('show', Boolean(reason));}
+      modal?.showModal();
+      setTimeout(()=>document.getElementById('editUser')?.focus(),80);
+      return false;
+    }
+    function closeLoginModal(){document.getElementById('loginModal')?.close();}
+    function requireEditorAction(reason='editar'){
+      if(isEditorLogged()) return true;
+      openLoginModal(reason);
+      return false;
+    }
+    async function performLogin(){
+      const username=(document.getElementById('editUser')?.value||'').trim();
+      const password=(document.getElementById('editPass')?.value||'').trim();
+      const err=document.getElementById('loginError');
+      try{
+        if(!username || !password) throw new Error('Informe usuário e senha.');
+        const data=await apiPost({action:'login', username, password});
+        if(!data.token) throw new Error('Login não retornou sessão.');
+        editSession={token:data.token,user:data.user||username,expiresAt:data.expiresAt};
+        localStorage.setItem(EDIT_SESSION_KEY, JSON.stringify(editSession));
+        updateAuthUi(); closeLoginModal(); showToast('Edição liberada neste navegador.');
+      }catch(e){
+        if(err){err.textContent=e.message||'Login inválido.'; err.classList.add('show');}
+      }
+    }
+    function logoutEditor(){
+      editSession=null;
+      localStorage.removeItem(EDIT_SESSION_KEY);
+      updateAuthUi();
+      showToast('Você saiu do modo de edição.');
+    }
+
+
     function ensureStateShape(obj){
       const base = obj && typeof obj === 'object' ? obj : {};
       base.version = base.version || 1;
@@ -837,7 +914,8 @@
       return data;
     }
     async function apiPostAuthorized(payload){
-      return apiPost(payload);
+      if(!requireEditorAction('salvar alterações')) throw new Error('Login de edição necessário.');
+      return apiPost({...payload, editToken: editSession?.token || ''});
     }
     function normalizeServerItem(row){
       return {
@@ -950,6 +1028,7 @@
       }
     }
     async function saveMapToServer(){
+      if(!requireEditorAction('salvar o mapa')) return;
       try{
         updateMapSyncPill('Salvando mapa...');
         const payload = {
@@ -1098,12 +1177,14 @@
       btn.textContent = mapMoveMode ? '✓ Movimentação ativa' : '✥ Ajustar posições';
     }
     function toggleMoveMode(force){
+      if(!requireEditorAction('ajustar posições do mapa')) return;
       mapMoveMode = typeof force === 'boolean' ? force : !mapMoveMode;
       updateMapMoveButton();
       renderMap();
       showToast(mapMoveMode ? 'Modo de ajuste ativo: arraste os números na planta. Depois clique em Salvar mapa.' : 'Modo de ajuste desativado.');
     }
     function resetMapPositions(){
+      if(!requireEditorAction('restaurar posições do mapa')) return;
       if(!confirm('Restaurar as posições originais dos marcadores da planta?')) return;
       state.items.forEach(item=>{
         const base=seedItems.find(s=>s.id===item.id);
@@ -1180,6 +1261,7 @@
     }
 
     function renderAll(){
+      updateAuthUi();
       renderKpis(); renderOverview(); renderMap(); renderWorks(); renderCosts(); renderEvidence(); renderSchedule();
       document.getElementById('updatedAtPill').textContent = `Atualizado: ${new Date(state.updatedAt).toLocaleString('pt-BR')}`;
     }
@@ -1525,6 +1607,7 @@
       }catch(err){ showToast(`Importou localmente, mas não salvou no banco: ${escapeHtml(err.message)}`); }
     }
     async function syncSeedCostsToServer(silent=false){
+      if(!requireEditorAction('sincronizar custos')) return;
       const costs=getCompleteCostSeed();
       if(!costs.length){ showToast('Não encontrei a tabela de custos embutida.'); return; }
       if(!silent && !confirm(`Vou gravar no Supabase a tabela completa de custos da planilha 25/05/26. Isso substitui somente a tabela de custos e não altera fotos nem posições do mapa. Continuar?`)) return;
@@ -1597,10 +1680,23 @@
     }
 
     function filteredCostRows(){
-      const q=(document.getElementById('costSearch')?.value||'').toLowerCase().trim();
+      const raw=(document.getElementById('costSearch')?.value||'').trim();
+      const q=raw.toLowerCase();
       const rows=getCostRows();
       if(!q) return rows;
-      return rows.filter(r=>[r.itemId,r.setor,r.cotacao,r.pedido,r.fornecedor,r.produto,r.statusCompra,r.disciplina,r.origem].join(' ').toLowerCase().includes(q));
+      const target=normalizeLooseText(raw);
+      const itemIds=new Set(state.items.map(i=>normalizeLooseText(i.id)));
+      if(itemIds.has(target)) return rows.filter(r=>normalizeLooseText(r.itemId)===target);
+      return rows.filter(r=>[r.itemId,r.setor,r.cotacao,r.pedido,r.fornecedor,r.produto,r.statusCompra,r.disciplina,r.origem,r.dataCotacao,r.dataPedido].join(' ').toLowerCase().includes(q));
+    }
+    function itemCostSummaryFromRows(rows){
+      const grouped={};
+      rows.forEach(r=>{
+        const id=String(r.itemId||'Sem item').trim() || 'Sem item';
+        if(!grouped[id]) grouped[id]={id, area:(getItem(id)?.area || r.setor || ''), value:0};
+        grouped[id].value += Number(r.valor)||0;
+      });
+      return Object.values(grouped).sort((a,b)=>b.value-a.value);
     }
     function filteredItems(){
       const q=(document.getElementById('searchInput')?.value||'').toLowerCase().trim();
@@ -1625,7 +1721,9 @@
         </tr>`).join('') || `<tr><td colspan="8"><div class="empty">Nenhum item encontrado com os filtros atuais.</div></td></tr>`;
     }
     function renderCosts(){
-      const costRows=getCostRows();
+      const allCostRows=getCostRows();
+      const costRows=filteredCostRows();
+      const isFiltered=Boolean((document.getElementById('costSearch')?.value||'').trim());
       const summary=costSummaryFromRows(costRows);
       const total=costRows.reduce((a,r)=>a+(Number(r.valor)||0),0);
       const comprado=statusValue(summary,'Comprado');
@@ -1635,7 +1733,7 @@
       const orcNaoAprovado=statusValue(summary,'Orçamento não Aprovado');
       const noCost=state.items.filter(i=>!Number(i.cost)).length;
       const k=[
-        ['Total de custos',fmtMoney(total),'Tabela detalhada'],
+        ['Total de custos',fmtMoney(total),isFiltered ? 'Resultado filtrado' : 'Tabela detalhada'],
         ['Comprado',fmtMoney(comprado),'Realizado / compra lançada'],
         ['Em orçamento',fmtMoney(emOrcamento),'Cotações em análise'],
         ['Em processo',fmtMoney(emProcesso),'Compra em andamento'],
@@ -1650,9 +1748,10 @@
       }
       const max=Math.max(...summary.map(r=>r.value),1);
       document.getElementById('costStatusBars').innerHTML=summary.map(r=>`<div class="bar-row"><b>${escapeHtml(r.status)}</b><div class="bar"><i style="width:${(r.value/max)*100}%;background:${normalizeLooseText(r.status).includes('cancel')?'var(--red)':normalizeLooseText(r.status).includes('nao aprovado')?'var(--orange)':normalizeLooseText(r.status).includes('orcamento')?'var(--yellow)':normalizeLooseText(r.status).includes('processo')?'var(--purple)':'linear-gradient(90deg,var(--blue),var(--cyan))'}"></i></div><span>${fmtMoney(r.value)}</span></div>`).join('') || '<div class="empty">Nenhum custo importado.</div>';
-      const topItems=state.items.slice().sort((a,b)=>(Number(b.cost)||0)-(Number(a.cost)||0)).slice(0,10); const imax=Math.max(...topItems.map(i=>Number(i.cost)||0),1);
-      document.getElementById('itemCostBars').innerHTML=topItems.map(i=>`<div class="bar-row"><b>${i.id} · ${escapeHtml(i.area)}</b><div class="bar"><i style="width:${((Number(i.cost)||0)/imax)*100}%;background:${statusColor(i.status)}"></i></div><span>${fmtMoney(i.cost)}</span></div>`).join('');
-      const rows=filteredCostRows().slice(0,600);
+      const topItems=itemCostSummaryFromRows(costRows).slice(0,10); const imax=Math.max(...topItems.map(i=>Number(i.value)||0),1);
+      document.getElementById('itemCostBars').innerHTML=topItems.map(i=>`<div class="bar-row"><b>${escapeHtml(i.id)} · ${escapeHtml(i.area||'Sem área')}</b><div class="bar"><i style="width:${((Number(i.value)||0)/imax)*100}%;background:${statusColor(getItem(i.id)?.status||'AG. PROJETO')}"></i></div><span>${fmtMoney(i.value)}</span></div>`).join('') || '<div class="empty">Nenhum item encontrado para o filtro atual.</div>';
+      const note=document.getElementById('costFilterNote'); if(note) note.innerHTML = isFiltered ? `Filtro ativo: <b>${escapeHtml(document.getElementById('costSearch').value)}</b> · ${costRows.length} registro(s) · ${fmtMoney(total)}` : '';
+      const rows=costRows.slice(0,600);
       document.getElementById('costDetailBody').innerHTML=rows.map(r=>`<tr><td><b>${escapeHtml(r.itemId||'-')}</b></td><td>${escapeHtml(r.setor||'')}</td><td>${escapeHtml(r.cotacao||'')}</td><td>${escapeHtml(r.pedido||'')}</td><td>${escapeHtml(r.fornecedor||'')}</td><td><span class="td-title">${escapeHtml(r.produto||'')}</span><span class="td-sub">${escapeHtml(r.origem||r.source||'')}</span></td><td>${Number(r.quantidade)||''}</td><td><b>${fmtMoney(r.valor)}</b></td><td>${escapeHtml(r.statusCompra||'Não informado')}</td><td>${escapeHtml(r.disciplina||'')}</td></tr>`).join('') || `<tr><td colspan="10"><div class="empty">Nenhum custo encontrado. Use Importar Excel/JSON ou rode o SQL v21 com a aba Custos x Execução completa.</div></td></tr>`;
       document.getElementById('noCostBody').innerHTML=state.items.filter(i=>!Number(i.cost)).map(i=>`<tr><td><b>${i.id}</b></td><td>${escapeHtml(i.title)}</td><td><span class="status-pill pill" style="background:${statusColor(i.status)}">${i.status}</span></td><td>${escapeHtml(i.owner)}</td><td>${escapeHtml(i.next||'Vincular orçamento/cotação')}</td></tr>`).join('') || `<tr><td colspan="5"><div class="empty">Todos os itens possuem custo vinculado.</div></td></tr>`;
     }
@@ -1669,6 +1768,7 @@
     function clearFilters(){document.getElementById('searchInput').value='';document.getElementById('statusFilter').value='';document.getElementById('priorityFilter').value='';renderWorks()}
 
     function openModal(id){
+      if(!requireEditorAction('editar a obra')) return;
       currentModalId=id; const i=getItem(id); if(!i) return;
       document.getElementById('modalTitle').textContent=`${i.id} · ${i.title}`;
       document.getElementById('modalSub').textContent=`${i.area} · ${i.status}`;
@@ -1681,6 +1781,7 @@
     function updateRangeValue(){rangeValue.textContent=fmtPct(mProgress.value)}
     mProgress.addEventListener('input', updateRangeValue);
     mPhotos.addEventListener('change', async (e)=>{
+      if(!requireEditorAction('incluir imagens')){ e.target.value=''; return; }
       if(!currentModalId) return;
       const files=[...e.target.files];
       for(const file of files){
@@ -1710,6 +1811,7 @@
       modalGallery.innerHTML=photos.map((p,idx)=>`<div class="photo"><img src="${p.data}" alt="${escapeHtml(p.name)}" onclick="openPhotoPreview('${currentModalId}',${idx})" style="cursor:pointer"><button onclick="removePhoto('${currentModalId}',${idx})">✕</button><small>${escapeHtml(p.name)}</small></div>`).join('') || '<div class="empty" style="grid-column:1/-1">Nenhuma imagem anexada neste item.</div>';
     }
     async function removePhoto(id,idx){
+      if(!requireEditorAction('remover imagem')) return;
       const photo=state.photos[id]?.[idx];
       if(!confirm('Remover esta imagem da obra?')) return;
       state.photos[id].splice(idx,1);
@@ -1719,6 +1821,7 @@
       showToast('Foto removida.');
     }
     function saveModal(){
+      if(!requireEditorAction('salvar alterações da obra')) return;
       const i=getItem(currentModalId); if(!i) return;
       const oldId=i.id;
       Object.assign(i,{id:mItem.value.trim()||i.id, area:mArea.value, title:mTitle.value, status:mStatus.value, priority:mPriority.value, owner:mOwner.value, due:mDue.value, progress:Number(mProgress.value)||0, cost:Number(mCost.value)||0, link:mLink.value, x:clamp(mX.value,0,100), y:clamp(mY.value,0,100), next:mNext.value, notes:mNotes.value});
@@ -1726,10 +1829,12 @@
       saveState(`Item ${i.id} atualizado`); showToast(`Item ${escapeHtml(i.id)} atualizado.`); closeModal(); saveItemToServer(i);
     }
     function deleteCurrentItem(){
+      if(!requireEditorAction('excluir item')) return;
       if(!currentModalId) return; const i=getItem(currentModalId); if(!confirm(`Excluir o item ${i?.id}?`)) return;
       state.items=state.items.filter(x=>x.id!==currentModalId); delete state.photos[currentModalId]; selectedId=state.items[0]?.id; saveState(`Item ${currentModalId} excluído`); closeModal(); showToast('Item excluído.');
     }
     function addNewItem(){
+      if(!requireEditorAction('criar nova melhoria')) return;
       const n=state.items.length+1; const id=`NOVO-${String(n).padStart(2,'0')}`;
       state.items.push({id,area:'Nova área',title:'Nova melhoria cadastrada',status:'AG. PROJETO',progress:0,owner:'A definir',priority:'Média',cost:0,due:'',x:50,y:50,next:'Definir escopo, responsável, custo e prazo.',notes:''});
       saveState(`Novo item ${id} criado`); openModal(id);
@@ -1855,7 +1960,12 @@
       XLSX.writeFile(wb,fileName,{compression:true});
       showToast('Planilha exportada em Excel com abas separadas.');
     }
+    function selectImportFile(){
+      if(!requireEditorAction('importar dados')) return;
+      document.getElementById('importFile')?.click();
+    }
     importFile.addEventListener('change', async e=>{
+      if(!requireEditorAction('importar dados')){ e.target.value=''; return; }
       const file=e.target.files[0]; if(!file) return;
       try{
         const name=(file.name||'').toLowerCase();
@@ -1869,7 +1979,7 @@
       }
       catch(err){showToast(`Erro na importação: ${escapeHtml(err.message)}`)} finally{e.target.value=''}
     });
-    function resetState(){if(!confirm('Isso apagará as alterações locais deste navegador. Continuar?')) return; localStorage.removeItem(STORAGE_KEY); state=loadState(); mapZoom=Number(state.mapZoom)||1; selectedId=state.items[0]?.id; renderAll(); showToast('Modelo original restaurado.');}
+    function resetState(){if(!requireEditorAction('apagar dados locais')) return; if(!confirm('Isso apagará as alterações locais deste navegador. Continuar?')) return; localStorage.removeItem(STORAGE_KEY); state=loadState(); mapZoom=Number(state.mapZoom)||1; selectedId=state.items[0]?.id; renderAll(); showToast('Modelo original restaurado.');}
 
     searchInput.addEventListener('input', renderWorks); statusFilter.addEventListener('change', renderWorks); priorityFilter.addEventListener('change', renderWorks); document.addEventListener('input', e=>{ if(e.target && e.target.id==='costSearch') renderCosts(); });
     initNav(); setupMapZoom(); bootstrapPanel();
