@@ -15,5 +15,5 @@
     Cache-Control = "public, max-age=0, must-revalidate"
 
 [functions]
-  directory = "functions"
+  directory = "netlify/functions"
   node_bundler = "esbuild"

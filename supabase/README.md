@@ -1,16 +1,23 @@
-# Supabase — STEP Obras
+# Supabase — Painel STEP Obras
 
-Use `schema_step_obras.sql` para criar as tabelas, políticas e bucket inicial.
+Esta pasta é a base da próxima etapa, quando o painel deixar de salvar só no navegador e passar a salvar em nuvem.
 
-Principais tabelas:
+## O que este schema cria
 
-- `step_obras_items`
-- `step_obras_photos`
-- `step_obras_history`
-- `step_obras_config`
+- `step_obras_items`: status, avanço, custo, responsável, prazo e posição dos marcadores no mapa.
+- `step_obras_photos`: metadados das fotos/evidências.
+- `step_obras_history`: histórico de alterações.
+- bucket `step-obras-evidencias`: armazenamento das imagens.
 
-Bucket de imagens:
+## Como usar
 
-- `step-obras-evidencias`
+1. Criar projeto no Supabase.
+2. Ir em SQL Editor.
+3. Colar e executar `schema_step_obras.sql`.
+4. Habilitar Auth por e-mail, se for usar login.
+5. Ajustar as policies antes de produção.
 
-A chave `service_role` deve ficar somente nas variáveis seguras do ambiente de publicação.
+## Atenção
+
+O `anon key` do Supabase pode ficar no frontend, desde que o RLS esteja correto.
+Nunca coloque `service_role key` no HTML, GitHub ou Netlify público.
