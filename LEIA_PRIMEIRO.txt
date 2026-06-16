@@ -1,0 +1,21 @@
+STEP OBRAS - PACOTE V15 FORÇANDO PUBLICAÇÃO
+
+Este pacote resolve o caso em que o CMD anterior enviou apenas .gitignore.
+
+COMO USAR:
+1. Extraia este ZIP em qualquer pasta.
+2. Dê dois cliques em SUBSTITUIR_E_PUBLICAR_V15.cmd.
+3. O CMD vai copiar a pasta site para:
+   C:\Users\douglas.tabella\Downloads\Obras Base Step\step_painel_obras_netlify_v5
+4. Depois ele faz commit e push no repositório:
+   https://github.com/stepsolutions-obras/stepsolutions-obrasbase.git
+5. No Netlify, rode Clear cache and deploy site.
+
+IMPORTANTE:
+- Não coloque .env no GitHub.
+- A service_role/secret deve ficar só nas variáveis do Netlify.
+- Depois do deploy, teste: /.netlify/functions/obras?health=1
+
+ATUALIZAÇÃO V17:
+- Corrigida a cor das opções em campos de seleção, inclusive no modal de Novo orçamento.
+- O ZIP permanece completo no mesmo padrão de publicação anterior.
