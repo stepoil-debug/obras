@@ -28,3 +28,7 @@ Desktop.ini
 *.bak
 *.tmp
 *.log
+!.env.example
+*.local
+SUBIR_*.cmd
+SUBIR_*.bat
