@@ -1,0 +1,53 @@
+name: Inject cost detail assets
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - '.github/workflows/inject-cost-detail.yml'
+
+permissions:
+  contents: write
+
+jobs:
+  inject:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          ref: main
+          fetch-depth: 0
+
+      - name: Inject cost detail scripts into index
+        shell: bash
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+          p = Path('index.html')
+          text = p.read_text(encoding='utf-8')
+          marker = '<!-- STEP_COST_DETAIL_ASSETS_V1 -->'
+          if marker not in text:
+              snippet = '''\n  <!-- STEP_COST_DETAIL_ASSETS_V1 -->\n  <script src="/data/cost-source-v1.js?v=20260901"></script>\n  <script src="/assets/cost-details-v1.js?v=20260901"></script>\n'''
+              pos = text.lower().rfind('</body>')
+              if pos < 0:
+                  raise SystemExit('index.html sem </body>')
+              text = text[:pos] + snippet + text[pos:]
+              p.write_text(text, encoding='utf-8')
+              print('Scripts de detalhamento inseridos no index.html')
+          else:
+              print('Marcador já existe; nada a alterar')
+          PY
+
+      - name: Commit change
+        shell: bash
+        run: |
+          if git diff --quiet -- index.html; then
+            echo "Sem alteração pendente"
+            exit 0
+          fi
+          git config user.name "STEP Obras Automation"
+          git config user.email "actions@users.noreply.github.com"
+          git add index.html
+          git commit -m "feat(obras): habilita botão e popup de detalhamento de custos"
+          git push origin main
