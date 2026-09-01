@@ -19,35 +19,56 @@ jobs:
           ref: main
           fetch-depth: 0
 
-      - name: Inject cost detail scripts into index
+      - name: Inject and validate cost detail assets
         shell: bash
         run: |
           python - <<'PY'
           from pathlib import Path
+          import re
+
           p = Path('index.html')
           text = p.read_text(encoding='utf-8')
           marker = '<!-- STEP_COST_DETAIL_ASSETS_V1 -->'
+          snippet = '''\n  <!-- STEP_COST_DETAIL_ASSETS_V1 -->\n  <script src="/data/cost-source-v1.js?v=20260901b"></script>\n  <script src="/assets/cost-details-v1.js?v=20260901b"></script>\n'''
           if marker not in text:
-              snippet = '''\n  <!-- STEP_COST_DETAIL_ASSETS_V1 -->\n  <script src="/data/cost-source-v1.js?v=20260901"></script>\n  <script src="/assets/cost-details-v1.js?v=20260901"></script>\n'''
               pos = text.lower().rfind('</body>')
               if pos < 0:
                   raise SystemExit('index.html sem </body>')
               text = text[:pos] + snippet + text[pos:]
-              p.write_text(text, encoding='utf-8')
-              print('Scripts de detalhamento inseridos no index.html')
           else:
-              print('Marcador já existe; nada a alterar')
+              text = re.sub(
+                  r'\n\s*<!-- STEP_COST_DETAIL_ASSETS_V1 -->\s*\n\s*<script src="/data/cost-source-v1\.js\?v=[^"]+"></script>\s*\n\s*<script src="/assets/cost-details-v1\.js\?v=[^"]+"></script>\s*\n',
+                  snippet,
+                  text,
+                  count=1
+              )
+          p.write_text(text, encoding='utf-8')
+
+          js_path = Path('assets/cost-details-v1.js')
+          js = js_path.read_text(encoding='utf-8')
+          js2 = re.sub(
+              r"  function esc\(v\)\{\n.*?\n  \}",
+              "  function esc(v){\n    const el=document.createElement('div'); el.textContent=String(v ?? ''); return el.innerHTML;\n  }",
+              js,
+              count=1,
+              flags=re.S
+          )
+          if js2 == js:
+              raise SystemExit('Não foi possível localizar function esc para correção')
+          js_path.write_text(js2, encoding='utf-8')
+          print('Assets e cache-buster atualizados')
           PY
+          node --check assets/cost-details-v1.js
 
       - name: Commit change
         shell: bash
         run: |
-          if git diff --quiet -- index.html; then
+          if git diff --quiet -- index.html assets/cost-details-v1.js; then
             echo "Sem alteração pendente"
             exit 0
           fi
           git config user.name "STEP Obras Automation"
           git config user.email "actions@users.noreply.github.com"
-          git add index.html
-          git commit -m "feat(obras): habilita botão e popup de detalhamento de custos"
+          git add index.html assets/cost-details-v1.js
+          git commit -m "fix(obras): valida detalhamento e atualiza cache dos assets"
           git push origin main
