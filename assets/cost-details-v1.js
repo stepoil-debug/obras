@@ -23,7 +23,7 @@
   let observerTimer = null;
 
   function esc(v){
-    return String(v ?? '').replace(/[&<>'\"]/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;',"'":'&#39;','\"':'&quot;'}[c]));
+    const el=document.createElement('div'); el.textContent=String(v ?? ''); return el.innerHTML;
   }
   function fmtMoney(v){ return money.format(Number(v)||0); }
   function fmtDate(v){
