@@ -1,0 +1,69 @@
+name: Diagnose cost status totals
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - '.github/workflows/diag-cost-status.yml'
+
+permissions:
+  contents: read
+
+jobs:
+  diagnose:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Aggregate embedded cost source
+        shell: bash
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+          import re, base64, gzip, json
+          from collections import defaultdict
+
+          text=Path('data/cost-source-v1.js').read_text(encoding='utf-8')
+          m=re.search(r'STEP_COST_SOURCE_GZIP_B64="([^"]+)"', text)
+          if not m:
+              raise SystemExit('embedded cost source not found')
+          rows=json.loads(gzip.decompress(base64.b64decode(m.group(1))).decode('utf-8'))
+          print('ROWS', len(rows))
+
+          def status(r): return str(r[12] or '').strip()
+          def money(x): return round(float(x or 0),2)
+          raw=defaultdict(float); counts=defaultdict(int)
+          for r in rows:
+              raw[status(r)] += float(r[10] or 0)
+              counts[status(r)] += 1
+          print('RAW_STATUS_TOTALS')
+          for k in sorted(raw): print(f'{k}\t{counts[k]}\t{raw[k]:.2f}')
+          print(f'RAW_GRAND\t{sum(raw.values()):.2f}')
+
+          # Same economic identity currently used by cost-details-v1.js.
+          seen=set(); dedup=defaultdict(float); dcounts=defaultdict(int)
+          for r in rows:
+              key=(str(r[3] or ''),str(r[5] or ''),str(r[8] or '').strip().upper(),float(r[9] or 0),round(float(r[10] or 0),4))
+              if key in seen: continue
+              seen.add(key)
+              dedup[status(r)] += float(r[10] or 0)
+              dcounts[status(r)] += 1
+          print('DEDUP_STATUS_TOTALS')
+          for k in sorted(dedup): print(f'{k}\t{dcounts[k]}\t{dedup[k]:.2f}')
+          print(f'DEDUP_GRAND\t{sum(dedup.values()):.2f}')
+
+          # Normalize status spellings for dashboard categories.
+          def canon(s):
+              x=s.strip().casefold()
+              if 'não aprovado' in x or 'nao aprovado' in x: return 'Orçamento não Aprovado'
+              if x == 'comprado': return 'Comprado'
+              if x == 'cancelado': return 'Cancelado'
+              if x == 'em orçamento' or x == 'em orcamento': return 'Em Orçamento'
+              if x == 'gerar pedido': return 'Gerar Pedido'
+              if x == 'em processo de compra': return 'Em Processo de Compra'
+              return s.strip() or 'Sem status'
+          norm=defaultdict(float)
+          for r in rows: norm[canon(status(r))] += float(r[10] or 0)
+          print('NORMALIZED_RAW')
+          for k in sorted(norm): print(f'{k}\t{norm[k]:.2f}')
+          print(f'NORMALIZED_GRAND\t{sum(norm.values()):.2f}')
+          PY
