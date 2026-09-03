@@ -7,7 +7,7 @@ on:
       - '.github/workflows/diag-cost-status.yml'
 
 permissions:
-  contents: read
+  contents: write
 
 jobs:
   diagnose:
@@ -19,51 +19,69 @@ jobs:
         run: |
           python - <<'PY'
           from pathlib import Path
-          import re, base64, gzip, json
+          import re, base64, gzip, json, traceback
           from collections import defaultdict
 
-          text=Path('data/cost-source-v1.js').read_text(encoding='utf-8')
-          m=re.search(r'STEP_COST_SOURCE_GZIP_B64="([^"]+)"', text)
-          if not m:
-              raise SystemExit('embedded cost source not found')
-          rows=json.loads(gzip.decompress(base64.b64decode(m.group(1))).decode('utf-8'))
-          print('ROWS', len(rows))
+          out=[]
+          def p(*x): out.append(' '.join(map(str,x)))
+          try:
+              text=Path('data/cost-source-v1.js').read_text(encoding='utf-8')
+              m=re.search(r'STEP_COST_SOURCE_GZIP_B64="([^"]+)"', text)
+              if not m: raise RuntimeError('embedded cost source not found')
+              payload=gzip.decompress(base64.b64decode(m.group(1))).decode('utf-8')
+              rows=json.loads(payload)
+              p('TYPE',type(rows).__name__,'ROWS',len(rows))
+              if rows: p('FIRST_TYPE',type(rows[0]).__name__,'FIRST_LEN',len(rows[0]) if hasattr(rows[0],'__len__') else '-')
+              def at(r,i,default=''):
+                  try: return r[i]
+                  except Exception: return default
+              def st(r): return str(at(r,12,'') or '').strip()
+              def val(r):
+                  try: return float(at(r,10,0) or 0)
+                  except Exception: return 0.0
+              raw=defaultdict(float); counts=defaultdict(int)
+              for r in rows:
+                  raw[st(r)] += val(r); counts[st(r)] += 1
+              p('RAW_STATUS_TOTALS')
+              for k in sorted(raw): p(k,'|',counts[k],'|',f'{raw[k]:.2f}')
+              p('RAW_GRAND','|',f'{sum(raw.values()):.2f}')
 
-          def status(r): return str(r[12] or '').strip()
-          def money(x): return round(float(x or 0),2)
-          raw=defaultdict(float); counts=defaultdict(int)
-          for r in rows:
-              raw[status(r)] += float(r[10] or 0)
-              counts[status(r)] += 1
-          print('RAW_STATUS_TOTALS')
-          for k in sorted(raw): print(f'{k}\t{counts[k]}\t{raw[k]:.2f}')
-          print(f'RAW_GRAND\t{sum(raw.values()):.2f}')
+              seen=set(); dedup=defaultdict(float); dcounts=defaultdict(int)
+              for r in rows:
+                  try: qty=float(at(r,9,0) or 0)
+                  except Exception: qty=0.0
+                  key=(str(at(r,3,'') or ''),str(at(r,5,'') or ''),str(at(r,8,'') or '').strip().upper(),qty,round(val(r),4))
+                  if key in seen: continue
+                  seen.add(key); dedup[st(r)] += val(r); dcounts[st(r)] += 1
+              p('DEDUP_STATUS_TOTALS')
+              for k in sorted(dedup): p(k,'|',dcounts[k],'|',f'{dedup[k]:.2f}')
+              p('DEDUP_GRAND','|',f'{sum(dedup.values()):.2f}')
 
-          # Same economic identity currently used by cost-details-v1.js.
-          seen=set(); dedup=defaultdict(float); dcounts=defaultdict(int)
-          for r in rows:
-              key=(str(r[3] or ''),str(r[5] or ''),str(r[8] or '').strip().upper(),float(r[9] or 0),round(float(r[10] or 0),4))
-              if key in seen: continue
-              seen.add(key)
-              dedup[status(r)] += float(r[10] or 0)
-              dcounts[status(r)] += 1
-          print('DEDUP_STATUS_TOTALS')
-          for k in sorted(dedup): print(f'{k}\t{dcounts[k]}\t{dedup[k]:.2f}')
-          print(f'DEDUP_GRAND\t{sum(dedup.values()):.2f}')
-
-          # Normalize status spellings for dashboard categories.
-          def canon(s):
-              x=s.strip().casefold()
-              if 'não aprovado' in x or 'nao aprovado' in x: return 'Orçamento não Aprovado'
-              if x == 'comprado': return 'Comprado'
-              if x == 'cancelado': return 'Cancelado'
-              if x == 'em orçamento' or x == 'em orcamento': return 'Em Orçamento'
-              if x == 'gerar pedido': return 'Gerar Pedido'
-              if x == 'em processo de compra': return 'Em Processo de Compra'
-              return s.strip() or 'Sem status'
-          norm=defaultdict(float)
-          for r in rows: norm[canon(status(r))] += float(r[10] or 0)
-          print('NORMALIZED_RAW')
-          for k in sorted(norm): print(f'{k}\t{norm[k]:.2f}')
-          print(f'NORMALIZED_GRAND\t{sum(norm.values()):.2f}')
+              def canon(s):
+                  x=s.strip().casefold()
+                  if 'não aprovado' in x or 'nao aprovado' in x: return 'Orçamento não Aprovado'
+                  if x == 'comprado': return 'Comprado'
+                  if x == 'cancelado': return 'Cancelado'
+                  if x in ('em orçamento','em orcamento'): return 'Em Orçamento'
+                  if x == 'gerar pedido': return 'Gerar Pedido'
+                  if x == 'em processo de compra': return 'Em Processo de Compra'
+                  return s.strip() or 'Sem status'
+              norm=defaultdict(float); ncount=defaultdict(int)
+              for r in rows: norm[canon(st(r))] += val(r); ncount[canon(st(r))] += 1
+              p('NORMALIZED_RAW')
+              for k in sorted(norm): p(k,'|',ncount[k],'|',f'{norm[k]:.2f}')
+              p('NORMALIZED_GRAND','|',f'{sum(norm.values()):.2f}')
+          except Exception:
+              p('ERROR')
+              p(traceback.format_exc())
+          Path('diag-cost-status.txt').write_text('\n'.join(out)+'\n',encoding='utf-8')
+          print('\n'.join(out))
           PY
+      - name: Commit diagnostic result
+        shell: bash
+        run: |
+          git config user.name 'STEP Obras Diagnostics'
+          git config user.email 'actions@users.noreply.github.com'
+          git add diag-cost-status.txt
+          git commit -m 'chore(obras): resultado temporario do diagnostico de custos' || exit 0
+          git push
